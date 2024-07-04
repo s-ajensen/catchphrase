@@ -45,6 +45,10 @@
       (sut/-run-round! @tf2/ctf)
       (should-have-invoked :sleep! {:with [(:round-length @tf2/ctf)]}))
 
+    (it "stops round"
+      (sut/-run-round! @tf2/ctf)
+      (should= :round-end (:state @tf2/ctf)))
+
     (it "it assigns points to non-active team"
       (sut/-run-round! @tf2/ctf)
       (let [[blu red] (teamc/by-game @tf2/ctf)]

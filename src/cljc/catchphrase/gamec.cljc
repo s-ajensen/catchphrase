@@ -23,3 +23,6 @@
   (assoc game :state :started
               :round-start (time/now)
               :round-length (+ base-len (time/seconds (rand-int 20)))))
+
+(defn stop-round [game]
+  (assoc game :state :round-end))

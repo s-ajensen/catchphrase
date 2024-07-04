@@ -45,7 +45,8 @@
   (with-lock
     (let [teams (teamc/by-game game)
           inactive-team (ccc/ffilter #(not= active-team (:id %)) teams)]
-      (db/tx (update inactive-team :points inc)))))
+      (db/tx* [(gamec/stop-round game)
+               (update inactive-team :points inc)]))))
 
 (defn run-round! [game]
   (future (-run-round! game)))
