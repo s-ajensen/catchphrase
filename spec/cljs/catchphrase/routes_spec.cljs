@@ -3,8 +3,8 @@
                    [speclj.core :refer [redefs-around around before context describe it should= stub with-stubs]])
   (:require [catchphrase.page :as page]
             [catchphrase.routes :as sut]
+            [catchphrase.state :as state]
             [secretary.core :as secretary]
-            [catchphrase.room :as room]
             [speclj.core]))
 
 (describe "Routes"
@@ -17,6 +17,6 @@
 
   (it-routes "/" :home)
   (it-routes "/room/sawmill" :room
-             (should= "sawmill" @room/code))
+             (should= "sawmill" @state/code))
   (it-routes "/room/egypt" :room
-             (should= "egypt" @room/code)))
+             (should= "egypt" @state/code)))

@@ -10,26 +10,18 @@
             [catchphrase.occupant :as occupant]
             [catchphrase.page :as page]))
 
-(def room-state (page/cursor [:room] {}))
-(defn install-room! [code]
-  (swap! room-state assoc :code code))
-(def code (reagent/track #(:code @room-state)))
-(def room (reagent/track #(db/ffind-by :room :code @code)))
-(def occupants (reagent/track #(map db/entity (:occupants @room))))
-(def game (reagent/track #(db/ffind :game)))
-
-(def blu (reagent/track #(db/ffind-by :team :game (:id @game) :color :blu)))
+(def blu (reagent/track #(db/ffind-by :team :game (:id @state/game) :color :blu)))
 (defn on-blu? [occupant] (= (:id @blu) (:team occupant)))
-(def blu-occupants (reagent/track #(filterv on-blu? @occupants)))
+(def blu-occupants (reagent/track #(filterv on-blu? @state/occupants)))
 
-(def red (reagent/track #(db/ffind-by :team :game (:id @game) :color :red)))
+(def red (reagent/track #(db/ffind-by :team :game (:id @state/game) :color :red)))
 (defn on-red? [occupant] (= (:id @red) (:team occupant)))
-(def red-occupants (reagent/track #(filterv on-red? @occupants)))
+(def red-occupants (reagent/track #(filterv on-red? @state/occupants)))
 
 (defn- maybe-join-room! [nickname]
   (when (not (str/blank? nickname))
     (ws/call! :room/join
-              {:nickname nickname :room-code @code}
+              {:nickname nickname :room-code @state/code}
               occupant/receive-join!)))
 
 (defn nickname-prompt [_]
@@ -75,7 +67,7 @@
         [:div.center
          [:div.game-container
           [:h1 "catchphrase"]
-          (game/full game)]]
+          (game/full)]]
         [:div.right-container
          [:br]
          [:br]
@@ -89,12 +81,12 @@
      [room-component])])
 
 (defn maybe-not-found []
-  (if @room
+  (if @state/room
     [nickname-prompt-or-room occupant/nickname]
     [:p#-not-found "Oops, we can't find your room..."]))
 
 (defn- fetch-room []
-  (ws/call! :room/fetch {:room-code @code} db/tx*))
+  (ws/call! :room/fetch {:room-code @state/code} db/tx*))
 
 (defn- clear-db! []
   (db/tx* (map db/soft-delete (db/find :room)))
@@ -106,7 +98,7 @@
   (fetch-room))
 
 (defmethod page/exiting! :room [_]
-  (reset! room-state {})
+  (reset! state/room-state {})
   (ws/call! :room/leave {} ccc/noop))
 
 (defmethod page/render :room [_]

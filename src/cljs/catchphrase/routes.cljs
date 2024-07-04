@@ -4,6 +4,7 @@
             [catchphrase.page :as page]
             [c3kit.apron.log :as log]
             [c3kit.wire.js :as wjs]
+            [catchphrase.state :as state]
             [secretary.core :as secretary]
             [catchphrase.room :as room]))
 
@@ -30,7 +31,7 @@
 
   (defroute "/" [] (load-page! :home))
   (defroute "/room/:code" [code]
-    (room/install-room! code)
+    (state/install-room! code)
     (load-page! :room))
 
   (hook-browser-navigation!))

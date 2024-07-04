@@ -19,7 +19,7 @@
   (tf2/with-schemas)
   (before (db/set-safety! false)
           (tf2/init)
-          (wire/render [sut/full tf2/ctf]))
+          (wire/render [sut/full]))
 
   (it "stucture"
     (should-select "#-game-container"))

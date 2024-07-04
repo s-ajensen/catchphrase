@@ -17,7 +17,7 @@
             [speclj.stub :as stub]))
 
 (defn load-room! [{:keys [code] :as _room}]
-  (sut/install-room! code)
+  (state/install-room! code)
   (routes/load-page! :room)
   (wire/flush))
 
@@ -71,11 +71,11 @@
       (should-have-invoked :ws/call! {:with [:room/leave {} ccc/noop]}))
 
     (it "resets room-state"
-      (should= {} @sut/room-state)))
+      (should= {} @state/room-state)))
 
   (context "maybe not found"
     (it "renders not found if no room"
-      (sut/install-room! nil)
+      (state/install-room! nil)
       (wire/flush)
       (should-select "#-not-found"))
 
