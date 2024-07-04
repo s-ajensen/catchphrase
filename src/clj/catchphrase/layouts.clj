@@ -44,7 +44,7 @@
     [:div.center-div.margin-top-plus-2
      [:h2.margin-bottom-0 "Amidst ancient stones and echoes past, the path you seek has faded fast."]
      [:h2.margin-bottom-0.text-align-center "Page not found (404)"]
-     [:img.center-div {:src "/images/not-found.webp" :style "max-width: 60%;"}]]))
+     [:img.center-div {:src "/images/tf2.jpg" :style "max-width: 60%;"}]]))
 
 (defn client-init
   ([] (client-init {}))
