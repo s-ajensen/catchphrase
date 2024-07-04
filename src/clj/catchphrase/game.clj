@@ -4,7 +4,8 @@
             [catchphrase.room :as room]
             [catchphrase.roomc :as roomc]
             [c3kit.bucket.api :as db]
-            [c3kit.wire.apic :as apic]))
+            [c3kit.wire.apic :as apic]
+            [catchphrase.teamc :as teamc]))
 
 (defn maybe-occupant-not-found [occupant]
   (when-not occupant (apic/fail {} "Occupant not found")))
@@ -20,10 +21,11 @@
 (defn ws-fetch-game [{:keys [connection-id] :as _request}]
   (let [occupant (occupantc/by-conn-id connection-id)
         room (roomc/by-occupant occupant)
-        game (gamec/by-room room)]
+        game (gamec/by-room room)
+        teams (teamc/by-game game)]
     (or (maybe-occupant-not-found occupant)
         (maybe-room-not-found room)
-        (apic/ok [game]))))
+        (apic/ok (cons game teams)))))
 
 (defn ws-start-game [request]
   )
