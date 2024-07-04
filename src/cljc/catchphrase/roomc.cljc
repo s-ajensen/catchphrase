@@ -1,5 +1,6 @@
 (ns catchphrase.roomc
-  (:require [c3kit.bucket.api :as db]
+  (:require [c3kit.apron.corec :as ccc]
+            [c3kit.bucket.api :as db]
             [catchphrase.occupantc :as occupantc]))
 
 (defn ->room [code]
@@ -13,9 +14,15 @@
     (db/tx room)))
 
 (defn add-occupant [{:keys [occupants] :as room} occupant]
-  (let [id      (occupantc/or-id occupant)
+  (let [id (occupantc/or-id occupant)
         occupants (conj occupants id)]
     (assoc room :occupants occupants)))
+
+(defn next-team [room]
+  (let [{:keys [blu red]} (frequencies (map (comp :team db/entity) (:occupants room)))]
+    (if (and (some? blu) (> blu (or red 0)))
+      :red
+      :blu)))
 
 (defn add-occupant! [room occupant]
   (db/tx (add-occupant room occupant)))

@@ -11,13 +11,15 @@
             [catchphrase.schema.full :as schema]
             [catchphrase.schema.game :as game]
             [catchphrase.schema.occupant :as occupant]
-            [catchphrase.schema.room :as room]))
+            [catchphrase.schema.room :as room]
+            [catchphrase.schema.team :as team]))
 
 (defn install-legend! []
   (legend/init! {:room       room/room
                  :occupant   occupant/occupant
                  :game       game/game
                  :game-room  game-room/game-room
+                 :team       team/team
                  :db/retract legend/retract
                  }))
 
