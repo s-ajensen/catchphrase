@@ -16,7 +16,7 @@
   (redefs-around [sut/load-page! (stub :load-page!)])
 
   (it-routes "/" :home)
-  (it-routes "/room/shrine" :room
-             (should= "shrine" @room/code))
-  (it-routes "/room/depths" :room
-             (should= "depths" @room/code)))
+  (it-routes "/room/sawmill" :room
+             (should= "sawmill" @room/code))
+  (it-routes "/room/egypt" :room
+             (should= "egypt" @room/code)))

@@ -26,7 +26,7 @@
       (it "one member and many connections"
         @(sut/push-to-occupant! @heavy :some/method [@sawmill])
         (should-have-invoked :ws/push! {:times 1})
-        (should-have-invoked :ws/push! {:with ["conn-lautrec" :some/method [@sawmill]]})))
+        (should-have-invoked :ws/push! {:with ["conn-heavy" :some/method [@sawmill]]})))
 
     (context "to members"
       (it "no connections"
@@ -41,10 +41,10 @@
       (it "one member and many connections"
         @(sut/push-to-occupants! [@heavy] :some/method [@sawmill])
         (should-have-invoked :ws/push! {:times 1})
-        (should-have-invoked :ws/push! {:with ["conn-lautrec" :some/method [@sawmill]]}))
+        (should-have-invoked :ws/push! {:with ["conn-heavy" :some/method [@sawmill]]}))
 
       (it "two members and many connections"
         @(sut/push-to-occupants! [@heavy @medic] :some/method [@sawmill])
         (should-have-invoked :ws/push! {:times 2})
-        (should-have-invoked :ws/push! {:with ["conn-lautrec" :some/method [@sawmill]]})
-        (should-have-invoked :ws/push! {:with ["conn-frampt" :some/method [@sawmill]]})))))
+        (should-have-invoked :ws/push! {:with ["conn-heavy" :some/method [@sawmill]]})
+        (should-have-invoked :ws/push! {:with ["conn-medic" :some/method [@sawmill]]})))))

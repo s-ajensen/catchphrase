@@ -45,7 +45,7 @@
   ;; web routes
   ; TODO - fixme
   (test-route "/" :get catchphrase.layouts/web-rich-client)
-  (test-route "/room/shrine" :get catchphrase.layouts/web-rich-client)
+  (test-route "/room/sawmill" :get catchphrase.layouts/web-rich-client)
 
   ;; websocket handlers
   (test-webs :ws/close             catchphrase.room/ws-leave-room)

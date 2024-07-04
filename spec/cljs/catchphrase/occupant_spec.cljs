@@ -19,7 +19,7 @@
       (should= @tf2/medic @sut/current)
       (should= (:nickname @tf2/medic) @sut/nickname))
 
-    (it "lautrec"
+    (it "heavy"
       (sut/install! @tf2/heavy)
       (should= @tf2/heavy @sut/current)
       (should= (:nickname @tf2/heavy) @sut/nickname)))
@@ -30,18 +30,18 @@
     (should-be-nil @sut/current))
 
   (context "receive-join!"
-    (before (set! ws/client (reagent/atom {:connection {:id "conn-lautrec"}})))
+    (before (set! ws/client (reagent/atom {:connection {:id "conn-heavy"}})))
 
     (it "transacts received entities"
-      (let [lautrec @tf2/heavy]
+      (let [heavy @tf2/heavy]
         (db/clear)
-        (should-be-nil (db/entity (:id lautrec)))
-        (sut/receive-join! [lautrec])
-        (should-not-be-nil (db/entity (:id lautrec)))))
+        (should-be-nil (db/entity (:id heavy)))
+        (sut/receive-join! [heavy])
+        (should-not-be-nil (db/entity (:id heavy)))))
 
     (it "install occupant"
-      (let [lautrec @tf2/heavy]
+      (let [heavy @tf2/heavy]
         (db/clear)
         (should-be-nil @sut/current)
-        (sut/receive-join! [lautrec])
-        (should= lautrec @sut/current)))))
+        (sut/receive-join! [heavy])
+        (should= heavy @sut/current)))))

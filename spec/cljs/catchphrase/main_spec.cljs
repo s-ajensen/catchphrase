@@ -19,7 +19,7 @@
   (wire-helper/stub-ws)
   (before (page/clear!))
 
-  (it "dispatches current page"
+  (it "disscout current page"
     (with-redefs [accountant/dispatch-current! (stub :dispatch-current!)
                   router/app-routes (stub :app-routes)
                   dom/render (stub :render)]

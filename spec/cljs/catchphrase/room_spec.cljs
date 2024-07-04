@@ -102,17 +102,17 @@
 
     (context "nickname prompt"
       (it "updates input on change"
-        (wire/change! "#-nickname-input" "Lautrec")
-        (should= "Lautrec" (wire/value "#-nickname-input"))
-        (wire/change! "#-nickname-input" "Patches")
-        (should= "Patches" (wire/value "#-nickname-input")))
+        (wire/change! "#-nickname-input" "heavy")
+        (should= "heavy" (wire/value "#-nickname-input"))
+        (wire/change! "#-nickname-input" "scout")
+        (should= "scout" (wire/value "#-nickname-input")))
 
       (context "button click"
         (it "joins room"
-          (wire/change! "#-nickname-input" "Lautrec")
+          (wire/change! "#-nickname-input" "heavy")
           (wire/click! "#-join-button")
           (should-have-invoked :ws/call! {:with [:room/join
-                                                 {:nickname "Lautrec" :room-code tf2/sawmill-code}
+                                                 {:nickname "heavy" :room-code tf2/sawmill-code}
                                                  occupant/receive-join!]}))
 
         (it "doesn't join room if blank nickname"
@@ -127,16 +127,16 @@
       (context "displays occupants"
 
         (it "with one occupant"
-          (let [lautrec @tf2/heavy]
+          (let [heavy @tf2/heavy]
             (run! db/delete (db/find :occupant))
-            (db/tx lautrec)
+            (db/tx heavy)
             (wire/flush)
-            (should= "Lautrec" (wire/html (str "#-occupant-" (:id lautrec))))))
+            (should= "heavy" (wire/html (str "#-occupant-" (:id heavy))))))
 
         (it "with multiple occupants"
-          (should= "Lautrec" (wire/html (str "#-occupant-" (:id @tf2/heavy-atom))))
-          (should= "Kingseeker Frampt" (wire/html (str "#-occupant-" (:id @tf2/medic-atom))))
-          (should= "Patches" (wire/html (str "#-occupant-" (:id @tf2/scout))))))
+          (should= "heavy" (wire/html (str "#-occupant-" (:id @tf2/heavy-atom))))
+          (should= "medic" (wire/html (str "#-occupant-" (:id @tf2/medic-atom))))
+          (should= "scout" (wire/html (str "#-occupant-" (:id @tf2/scout))))))
 
       (it "displays game"
         (should-select "#-game-container"))))

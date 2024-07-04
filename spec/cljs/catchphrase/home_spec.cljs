@@ -22,17 +22,17 @@
           (routes/load-page! :home))
 
   (context "joins room with code and nickname"
-    (it "UK2LLJ, Lautrec"
-      (reset! state/nickname "Lautrec")
+    (it "UK2LLJ, heavy"
+      (reset! state/nickname "heavy")
       (sut/navigate-to-room! ["UK2LLJ"])
       (should-have-invoked :navigate! {:with ["/room/UK2LLJ"]})))
 
   (context "nickname input"
     (it "updates value on change"
-      (wire/change! "#-nickname-input" "Lautrec")
-      (should= "Lautrec" (wire/value "#-nickname-input"))
-      (wire/change! "#-nickname-input" "Patches")
-      (should= "Patches" (wire/value "#-nickname-input"))))
+      (wire/change! "#-nickname-input" "heavy")
+      (should= "heavy" (wire/value "#-nickname-input"))
+      (wire/change! "#-nickname-input" "scout")
+      (should= "scout" (wire/value "#-nickname-input"))))
 
   (context "create room"
     (it "does nothing if no nickname"

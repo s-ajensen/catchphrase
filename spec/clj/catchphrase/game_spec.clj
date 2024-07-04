@@ -26,7 +26,7 @@
       (it "sends game"
         (let [response (sut/ws-fetch-game {:connection-id (:conn-id @tf2/heavy)})]
           (should= :ok (:status response))
-          (should= @tf2/koth (:payload response))))))
+          (should= @tf2/ctf (:payload response))))))
 
   (context "ws-inc-counter"
     (context "failure"
@@ -53,10 +53,10 @@
       (it "updates counter"
         (let [response (sut/ws-inc-counter {:connection-id (:conn-id @tf2/heavy)})]
           (should= :ok (:status response))
-          (should= 1 (:counter (db/entity (:id @tf2/koth))))))
+          (should= 1 (:counter (db/entity (:id @tf2/ctf))))))
 
-      (it "dispatches to occupants"
-        (let [game     @tf2/koth
+      (it "disscout to occupants"
+        (let [game     @tf2/ctf
               response (sut/ws-inc-counter {:connection-id (:conn-id @tf2/heavy)})]
           (should= :ok (:status response))
           (should-have-invoked :push-to-connections! {:with [(map (comp :conn-id db/entity) (:occupants @tf2/sawmill))

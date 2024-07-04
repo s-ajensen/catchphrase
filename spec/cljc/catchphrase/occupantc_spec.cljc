@@ -7,8 +7,8 @@
   (tf2/init-with-schemas)
 
   (it "constructor"
-    (let [occupant (sut/->occupant "Lautrec" "conn-id")]
-      (should= "Lautrec" (:nickname occupant))
+    (let [occupant (sut/->occupant "heavy" "conn-id")]
+      (should= "heavy" (:nickname occupant))
       (should= "conn-id" (:conn-id occupant))))
 
   (context "create-occupant!"

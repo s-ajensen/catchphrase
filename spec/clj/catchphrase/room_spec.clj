@@ -89,28 +89,28 @@
     (redefs-around [dispatch/push-to-occupants! (stub :push-to-occupants!)])
 
     (it "removes occupant from room"
-      (sut/ws-leave-room {:connection-id "conn-patches"})
+      (sut/ws-leave-room {:connection-id "conn-scout"})
       (should-not-contain (:id @scout) (:occupants @sawmill))
       (should= (mapv :id [@heavy @medic]) (:occupants @sawmill)))
 
     (it "removes occupant from db"
-      (sut/ws-leave-room {:connection-id "conn-patches"})
-      (should-be-nil (occupantc/by-conn-id "conn-patches")))
+      (sut/ws-leave-room {:connection-id "conn-scout"})
+      (should-be-nil (occupantc/by-conn-id "conn-scout")))
 
     (it "notifies occupants of new room state"
-      (sut/ws-leave-room {:connection-id "conn-patches"})
+      (sut/ws-leave-room {:connection-id "conn-scout"})
       (should-have-invoked :push-to-occupants! {:with [(map db/entity (:occupants @sawmill))
                                                        :room/update
                                                        [@sawmill]]}))
 
     (it "deletes room if last person leaves"
-      (sut/ws-leave-room {:connection-id "conn-patches"})
-      (sut/ws-leave-room {:connection-id "conn-frampt"})
-      (sut/ws-leave-room {:connection-id "conn-lautrec"})
+      (sut/ws-leave-room {:connection-id "conn-scout"})
+      (sut/ws-leave-room {:connection-id "conn-medic"})
+      (sut/ws-leave-room {:connection-id "conn-heavy"})
       (should-be-nil @tf2/sawmill)))
 
   (context "ws-fetch-room"
-    (before (roomc/create-room! "depths"))
+    (before (roomc/create-room! "egypt"))
 
     (it "missing room"
       (let [response (sut/ws-fetch-room {:params {}})]
