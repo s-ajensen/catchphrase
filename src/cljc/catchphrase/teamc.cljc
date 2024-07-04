@@ -9,3 +9,6 @@
 
 (defn create-team! [game color]
   (db/tx (create-team game color)))
+
+(defn by-game [game]
+  (db/find-by :team :game (:id game game)))

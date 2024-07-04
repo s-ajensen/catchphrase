@@ -60,6 +60,7 @@
    :room/leave          'catchphrase.room/ws-leave-room
    :room/fetch          'catchphrase.room/ws-fetch-room
    :game/fetch          'catchphrase.game/ws-fetch-game
+   :game/start          'catchphrase.game/ws-start-game
    :game/inc-counter    'catchphrase.game/ws-inc-counter
    })
 

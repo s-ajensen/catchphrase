@@ -26,7 +26,7 @@
       (it "sends game"
         (let [response (sut/ws-fetch-game {:connection-id (:conn-id @tf2/heavy)})]
           (should= :ok (:status response))
-          (should= @tf2/ctf (:payload response))))))
+          (should= [@tf2/ctf] (:payload response))))))
 
   (context "ws-inc-counter"
     (context "failure"

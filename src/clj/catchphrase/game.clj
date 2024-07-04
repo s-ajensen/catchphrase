@@ -23,7 +23,10 @@
         game (gamec/by-room room)]
     (or (maybe-occupant-not-found occupant)
         (maybe-room-not-found room)
-        (apic/ok game))))
+        (apic/ok [game]))))
+
+(defn ws-start-game [request]
+  )
 
 (defn inc-counter! [game]
   (db/tx (update game :counter inc)))
