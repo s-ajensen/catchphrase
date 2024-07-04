@@ -40,16 +40,18 @@
 
 (defn sleep! [ms] (Thread/sleep ms))
 
-(defn -run-round! [{:keys [round-length active-team] :as game}]
+(defn -run-round! [{:keys [round-length active-team] :as game} room]
   (sleep! round-length)
   (with-lock
     (let [teams (teamc/by-game game)
-          inactive-team (ccc/ffilter #(not= active-team (:id %)) teams)]
-      (db/tx* [(gamec/stop-round game)
-               (update inactive-team :points inc)]))))
+          inactive-team (ccc/ffilter #(not= active-team (:id %)) teams)
+          payload [(gamec/stop-round game)
+                   (update inactive-team :points inc)]]
+      (db/tx* payload)
+      (room/push-to-room! room payload :game/update))))
 
-(defn run-round! [game]
-  (future (-run-round! game)))
+(defn run-round! [game room]
+  (future (-run-round! game room)))
 
 (defn start-round! [game]
   (db/tx (gamec/start-round game)))
@@ -62,7 +64,7 @@
       (or (maybe-not-host room occupant)
           (let [game (start-round! game)]
             (room/push-to-room! room [game] :game/update)
-            (run-round! game)
+            (run-round! game room)
             (apic/ok [game]))))))
 
 (defn inc-counter! [game]

@@ -15,3 +15,5 @@
 
 (defn by-room [room]
   (db/ffind-by :game-room :room (:id room room)))
+(defn by-game [game]
+  (db/ffind-by :game-room :game (:id game game)))
