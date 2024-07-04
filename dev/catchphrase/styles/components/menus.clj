@@ -63,4 +63,9 @@
  {:font-size "18px"
   :padding "10px"
   :border-radius "5px"}]
+
+[:.game
+ {:display "flex"
+  :flex-direction "column"}]
+
 ))

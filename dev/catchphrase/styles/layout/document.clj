@@ -5,6 +5,13 @@
 (def screen
 (list
 
+  ["@font-face" {
+                 :font-family (str "'TF2 BUILD'")}
+   {:src        (str "url('/fonts/tf2build.ttf')")
+    :font-weight "normal"
+    :font-style  "normal"
+    }]
+
 [:body :html
  {:margin 0
   :padding 0
@@ -24,13 +31,14 @@
   :color "#333"
   :border "1px solid"
   :border-radius "4px"
+  :font-family "inherit"
   :text-align "center"}]
 
 [:button
- {:width "120px"
-  :padding "10px"
+ {:padding "10px"
   :font-size "16px"
   :border "none"
+  :font-family "inherit"
   :border-radius "5px"
   :cursor "pointer"
   :transition "background-color 0.3s"

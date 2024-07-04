@@ -40,7 +40,7 @@
   :width         "100%"
 })
 
-(def font-family (str "'Courier New', Courier, monospace"))
+(def font-family (str "'TF2 BUILD'"))
 
 (defn font-load [face weight]
   (list 

@@ -10,7 +10,7 @@
   (db/tx (:params push)))
 
 (defn game []
-  [:div#-game-container
+  [:div#-game-container.game
    [:p#-counter.text-align-center (:counter @current)]
    [:button#-inc-btn
     {:on-click #(ws/call! :game/inc-counter [] ccc/noop)}
