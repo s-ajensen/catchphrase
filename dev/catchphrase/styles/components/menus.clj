@@ -30,6 +30,11 @@
                    :text-align "right"
                    }]
 
+[:.right-container {
+                   :float "left"
+                   :text-align "left"
+                   }]
+
 [:.center {
            :display "flex"
            :justify-content "center"
