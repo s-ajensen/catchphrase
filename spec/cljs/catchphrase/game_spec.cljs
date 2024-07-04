@@ -19,7 +19,7 @@
   (tf2/with-schemas)
   (before (db/set-safety! false)
           (tf2/init)
-          (wire/render [sut/game]))
+          (wire/render [sut/full tf2/ctf]))
 
   (it "stucture"
     (should-select "#-game-container"))
@@ -32,6 +32,6 @@
     (should-have-invoked-ws :game/inc-counter [] ccc/noop))
 
   (it "receives game update"
-    (ws/push-handler {:kind :game/update :params (update @tf2/ctf :counter inc)})
+    (ws/push-handler {:kind :game/update :params [(update @tf2/ctf :counter inc)]})
     (wire/flush)
     (should= "1" (wire/text "#-counter"))))

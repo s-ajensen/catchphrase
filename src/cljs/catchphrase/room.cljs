@@ -16,6 +16,15 @@
 (def code (reagent/track #(:code @room-state)))
 (def room (reagent/track #(db/ffind-by :room :code @code)))
 (def occupants (reagent/track #(map db/entity (:occupants @room))))
+(def game (reagent/track #(db/ffind :game)))
+
+(def blu (reagent/track #(db/ffind-by :team :game (:id @game) :color :blu)))
+(defn on-blu? [occupant] (= (:id @blu) (:team occupant)))
+(def blu-occupants (reagent/track #(filterv on-blu? @occupants)))
+
+(def red (reagent/track #(db/ffind-by :team :game (:id @game) :color :red)))
+(defn on-red? [occupant] (= (:id @red) (:team occupant)))
+(def red-occupants (reagent/track #(filterv on-red? @occupants)))
 
 (defn- maybe-join-room! [nickname]
   (when (not (str/blank? nickname))
@@ -42,34 +51,42 @@
          "Join"]]])))
 
 (defn- fetch-game []
-  (ws/call! :game/fetch nil db/tx))
+  (ws/call! :game/fetch nil db/tx*))
 
-(defn room-component [_occupants-ratom]
+(defn display-team [prefix occupants]
+  [:ul (ccc/for-all [occupant occupants]
+    [:li
+     {:key (:id occupant)
+      :id  (str "-" prefix "-" (:id occupant))}
+     (:nickname occupant)])])
+
+(defn room-component []
   (reagent/create-class
     {:component-did-mount fetch-game
      :reagent-render
-     (fn [occupants-ratom]
+     (fn []
        [:div.main-container
         {:id "-room"}
         [:div.left-container
          [:br]
          [:br]
-         [:h3 "Occupants"]
-         [:ul (ccc/for-all [occupant @occupants-ratom]
-            [:li
-             {:key (:id occupant)
-              :id  (str "-occupant-" (:id occupant))}
-             (:nickname occupant)])]]
+         [:h3 "Team Blu"]
+         (display-team "blu" @blu-occupants)]
         [:div.center
          [:div.game-container
           [:h1 "catchphrase"]
-          (game/game)]]])}))
+          (game/full game)]]
+        [:div.right-container
+         [:br]
+         [:br]
+         [:h3 "Team Red"]
+         (display-team "red" @red-occupants)]])}))
 
 (defn nickname-prompt-or-room [nickname-ratom]
   [:div {:id "-prompt-or-room"}
    (if (str/blank? @nickname-ratom)
      [nickname-prompt nickname-ratom]
-     [room-component occupants])])
+     [room-component])])
 
 (defn maybe-not-found []
   (if @room
@@ -96,4 +113,5 @@
   [maybe-not-found])
 
 (defmethod ws/push-handler :room/update [push]
-  (db/tx* (:params push)))
+  (db/tx* (:params push))
+  (fetch-game))

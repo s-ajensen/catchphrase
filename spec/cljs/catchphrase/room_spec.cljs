@@ -96,7 +96,7 @@
         (stub/clear!)
         (occupant/install! @tf2/medic)
         (wire/flush)
-        (should-have-invoked :ws/call! {:with [:game/fetch nil db/tx]})
+        (should-have-invoked :ws/call! {:with [:game/fetch nil db/tx*]})
         (should-not-select "#-nickname-prompt")
         (should-select "#-room")))
 
@@ -124,23 +124,18 @@
       (before (occupant/install! @tf2/heavy)
               (wire/flush))
 
-      (context "displays occupants"
+      (context "displays teams"
+        (it "blu"
+          (should= "heavy" (wire/html (str "#-blu-" (:id @tf2/heavy))))
+          (should= "scout" (wire/html (str "#-blu-" (:id @tf2/scout)))))
 
-        (it "with one occupant"
-          (let [heavy @tf2/heavy]
-            (run! db/delete (db/find :occupant))
-            (db/tx heavy)
-            (wire/flush)
-            (should= "heavy" (wire/html (str "#-occupant-" (:id heavy))))))
-
-        (it "with multiple occupants"
-          (should= "heavy" (wire/html (str "#-occupant-" (:id @tf2/heavy-atom))))
-          (should= "medic" (wire/html (str "#-occupant-" (:id @tf2/medic-atom))))
-          (should= "scout" (wire/html (str "#-occupant-" (:id @tf2/scout))))))
+        (it "red"
+          (should= "medic" (wire/html (str "#-red-" (:id @tf2/medic))))))
 
       (it "displays game"
         (should-select "#-game-container"))))
 
   (it "receives room update"
     (ws/push-handler {:kind :room/update :params [(roomc/->room "Greetings")]})
+    (should-have-invoked :ws/call! {:with [:game/fetch nil db/tx*]})
     (should-not-be-nil (db/ffind-by :room :code "Greetings"))))
