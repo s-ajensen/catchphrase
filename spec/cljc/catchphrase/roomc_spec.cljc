@@ -30,7 +30,7 @@
       (let [room (sut/add-occupant {:occupants [123 124]} 125)]
         (should= [123 124 125] (:occupants room)))))
 
-  (context "add-occupant!"
+  (context "join-room!"
     (it "stores users who have joined in order"
       (sut/join-room! @egypt @spy)
       (sut/join-room! @egypt @medic)

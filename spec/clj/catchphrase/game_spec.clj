@@ -1,5 +1,6 @@
 (ns catchphrase.game-spec
-  (:require [catchphrase.teamc :as teamc]
+  (:require [c3kit.apron.time :as time]
+            [catchphrase.teamc :as teamc]
             [catchphrase.tf2 :as tf2]
             [catchphrase.dispatch :as dispatch]
             [catchphrase.game :as sut]
@@ -29,6 +30,42 @@
               [red blu] (teamc/by-game @tf2/ctf)]
           (should= :ok (:status response))
           (should= [@tf2/ctf red blu] (:payload response))))))
+
+  (context "ws-start-game"
+
+    (redefs-around [dispatch/push-to-occupants! (stub :push-to-occupants!)])
+
+    (it "fails is connection-id is not host"
+      (let [non-host @tf2/scout
+            response (sut/ws-start-game {:connection-id (:conn-id non-host)})]
+        (should= :fail (:status response))
+        (should-be-nil (:payload response))
+        (should= "Only the host can start the game!" (apic/flash-text response 0))))
+
+    (context "succeeds"
+
+      (it "with start time"
+        (with-redefs [time/now (constantly (time/now))]
+          (let [response (sut/ws-start-game {:connection-id (:conn-id @tf2/heavy)})]
+            (should= :ok (:status response))
+            (should= (time/now) (:round-start (first (:payload response))))
+            (should= (time/now) (:round-start @tf2/ctf)))))
+
+      (it "with round length"
+        (with-redefs [rand-int (stub :rand-int {:return 10})]
+          (let [response (sut/ws-start-game {:connection-id (:conn-id @tf2/heavy)})]
+            (should= :ok (:status response))
+            (should= (time/seconds 50) (:round-length (first (:payload response))))
+            (should= (time/seconds 50) (:round-length @tf2/ctf)))))
+
+      (it "notified occupants of game start"
+        (let [response (sut/ws-start-game {:connection-id (:conn-id @tf2/heavy)})]
+          (should= :ok (:status response))
+          (should-have-invoked :push-to-occupants! {:with [(map db/entity (:occupants @tf2/sawmill))
+                                                           :game/update
+                                                           [@tf2/ctf]]})))
+
+      ))
 
   (context "ws-inc-counter"
     (context "failure"
