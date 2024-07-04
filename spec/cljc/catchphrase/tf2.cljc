@@ -1,5 +1,7 @@
 (ns catchphrase.tf2
-  (:require [catchphrase.schema.full :as schema]
+  (:require [catchphrase.game-roomc :as game-roomc]
+            [catchphrase.gamec :as gamec]
+            [catchphrase.schema.full :as schema]
             [c3kit.bucket.api :as db]
             [c3kit.bucket.spec-helperc :as helperc]
             [catchphrase.occupantc :as occuantc]
@@ -16,8 +18,11 @@
 (def medic-atom (atom nil))
 (def scout-atom (atom nil))
 (def spy-atom (atom nil))
+(def pyro-atom (atom nil))
+(def demo-atom (atom nil))
 (def egypt-atom (atom nil))
 (def ctf-atom (atom nil))
+(def cp-atom (atom nil))
 
 (deftype Entity [atm]
   #?(:clj IDeref :cljs cljs.core/IDeref)
@@ -28,8 +33,11 @@
 (def medic (Entity. medic-atom))                            ;; a occupant at sawmill
 (def scout (Entity. scout-atom))                            ;; a occupant at sawmill
 (def spy (Entity. spy-atom))                                ;; a occupant who hasn't joined
+(def pyro (Entity. pyro-atom))                              ;; a occupant who hasn't joined
+(def demo (Entity. demo-atom))                              ;; a occupant who hasn't joined
 (def egypt (Entity. egypt-atom))                            ;; an empty room
 (def ctf (Entity. ctf-atom))                                ;; a game for sawmill
+(def cp (Entity. cp-atom))                                  ;; a game for egypt
 
 (defn init []
   (reset! sawmill-atom (roomc/create-room! sawmill-code))
@@ -38,11 +46,15 @@
   (reset! medic-atom (db/tx (occuantc/->occupant "medic" "conn-medic")))
   (reset! scout-atom (db/tx (occuantc/->occupant "scout" "conn-scout")))
   (reset! spy-atom (db/tx (occuantc/->occupant "spy" "conn-spy")))
-  (reset! ctf-atom (db/tx {:kind :game :room (:id @sawmill) :counter 0}))
-  (roomc/add-occupant! @sawmill @heavy)
-  (roomc/add-occupant! @sawmill @medic)
-  (roomc/add-occupant! @sawmill @scout)
-  (db/tx {:kind :game-room :game (:id @ctf) :room (:id @sawmill)}))
+  (reset! pyro-atom (db/tx (occuantc/->occupant "pyro" "conn-pyro")))
+  (reset! demo-atom (db/tx (occuantc/->occupant "demo" "conn-demo")))
+  (reset! ctf-atom (gamec/create-game!))
+  (reset! cp-atom (gamec/create-game!))
+  (game-roomc/create-game-room! @ctf @sawmill)
+  (game-roomc/create-game-room! @cp @egypt)
+  (roomc/join-room! @sawmill @heavy)
+  (roomc/join-room! @sawmill @medic)
+  (roomc/join-room! @sawmill @scout))
 
 (def memory-config {:impl :memory :store #?(:clj (atom nil) :cljs (reagent/atom nil))})
 

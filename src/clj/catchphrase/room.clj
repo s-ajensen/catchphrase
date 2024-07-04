@@ -59,9 +59,9 @@
 
 (defn- create-and-join! [room nickname connection-id]
   (let [occupant (occupantc/create-occupant! nickname connection-id)
-        room (roomc/add-occupant! room occupant)
+        room (roomc/join-room! room occupant)
         occupants (map db/entity (:occupants room))]
-    (push-to-room! room [room occupant])
+    (push-to-room! room [room (db/entity (:id occupant))])
     (apic/ok (cons room occupants))))
 
 (defn- assign-to-room! [{:keys [room-code nickname]} connection-id]

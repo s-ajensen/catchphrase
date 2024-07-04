@@ -1,10 +1,12 @@
 (ns catchphrase.roomc-spec
   (:require [c3kit.bucket.api :as db]
-            [catchphrase.tf2 :as tf2 :refer [sawmill egypt heavy spy medic scout]]
+            [catchphrase.game-roomc :as game-roomc]
+            [catchphrase.tf2 :as tf2 :refer [sawmill egypt heavy spy medic scout pyro demo]]
             [catchphrase.roomc :as roomc]
             [catchphrase.roomc :as sut]
             [speclj.core #?(:clj :refer :cljs :refer-macros) [describe context focus-it it should= should-not-contain
-                                                              should-not-be-nil should-be-nil stub redefs-around with-stubs]]))
+                                                              should-not-be-nil should-be-nil stub redefs-around
+                                                              should-contain with-stubs]]))
 
 (describe "roomc"
   (with-stubs)
@@ -30,10 +32,34 @@
 
   (context "add-occupant!"
     (it "stores users who have joined in order"
-      (sut/add-occupant! @egypt @spy)
-      (sut/add-occupant! @egypt @medic)
-      (sut/add-occupant! @egypt @scout)
-      (should= (mapv :id [@spy @medic @scout]) (:occupants @egypt))))
+      (sut/join-room! @egypt @spy)
+      (sut/join-room! @egypt @medic)
+      (sut/join-room! @egypt @scout)
+      (should= (mapv :id [@spy @medic @scout]) (:occupants @egypt)))
+
+    (it "joins BLU team teams are balanced"
+      (sut/join-room! @egypt @spy)
+      (let [game-room (game-roomc/by-room @egypt)
+            team (db/ffind-by :team :game (:game game-room) :color :blu)]
+        (should-not-be-nil (:team @spy))
+        (should= (:id team) (:team @spy))))
+
+    (it "joins RED team if BLU has 1 more occupant than RED"
+      (sut/join-room! @egypt @pyro)
+      (sut/join-room! @egypt @spy)
+      (let [game-room (game-roomc/by-room @egypt)
+            team (db/ffind-by :team :game (:game game-room) :color :red)]
+        (should-not-be-nil (:team @spy))
+        (should= (:id team) (:team @spy))))
+
+    (it "joins BLU team again if teams are balanced"
+      (sut/join-room! @egypt @pyro)
+      (sut/join-room! @egypt @spy)
+      (sut/join-room! @egypt @demo)
+      (let [game-room (game-roomc/by-room @egypt)
+            team (db/ffind-by :team :game (:game game-room) :color :blu)]
+        (should-not-be-nil (:team @demo))
+        (should= (:id team) (:team @demo)))))
 
   (context "remove-occupant"
     (it "from empty room"
