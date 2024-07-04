@@ -35,7 +35,8 @@
 (def base-len (time/seconds 40))
 
 (defn start-round! [game]
-  (db/tx (assoc game :round-start (time/now)
+  (db/tx (assoc game :state :started
+                     :round-start (time/now)
                      :round-length (+ base-len (time/seconds (rand-int 20))))))
 
 (defn ws-start-game [{:keys [connection-id] :as request}]

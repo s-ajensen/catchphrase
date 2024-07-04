@@ -8,6 +8,9 @@
             [c3kit.wire.apic :as apic]
             [speclj.core :refer :all]))
 
+(declare ^:dynamic response)
+(declare ^:dynamic game)
+
 (describe "Game"
   (with-stubs)
   (tf2/init-with-schemas)
@@ -44,26 +47,28 @@
 
     (context "succeeds"
 
+      (with response (sut/ws-start-game {:connection-id (:conn-id @tf2/heavy)}))
+      (with game (first (:payload @response)))
+
+      (it "starts game"
+        (should= :ok (:status @response))
+        (should= :started (:state @game)))
+
       (it "with start time"
         (with-redefs [time/now (constantly (time/now))]
-          (let [response (sut/ws-start-game {:connection-id (:conn-id @tf2/heavy)})]
-            (should= :ok (:status response))
-            (should= (time/now) (:round-start (first (:payload response))))
-            (should= (time/now) (:round-start @tf2/ctf)))))
+          (should= (time/now) (:round-start @game))
+          (should= (time/now) (:round-start @tf2/ctf))))
 
       (it "with round length"
         (with-redefs [rand-int (stub :rand-int {:return 10})]
-          (let [response (sut/ws-start-game {:connection-id (:conn-id @tf2/heavy)})]
-            (should= :ok (:status response))
-            (should= (time/seconds 50) (:round-length (first (:payload response))))
-            (should= (time/seconds 50) (:round-length @tf2/ctf)))))
+          (should= (time/seconds 50) (:round-length @game))
+          (should= (time/seconds 50) (:round-length @tf2/ctf))))
 
       (it "notified occupants of game start"
-        (let [response (sut/ws-start-game {:connection-id (:conn-id @tf2/heavy)})]
-          (should= :ok (:status response))
-          (should-have-invoked :push-to-occupants! {:with [(map db/entity (:occupants @tf2/sawmill))
-                                                           :game/update
-                                                           [@tf2/ctf]]})))
+        @response
+        (should-have-invoked :push-to-occupants! {:with [(map db/entity (:occupants @tf2/sawmill))
+                                                         :game/update
+                                                         [@tf2/ctf]]}))
 
       ))
 

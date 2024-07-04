@@ -5,6 +5,7 @@
   {:kind         (s/kind :game)
    :id           s/id
 
+   :state        {:type :keyword}
    :round-start  {:type :instant}
    :round-length {:type :long}
 
