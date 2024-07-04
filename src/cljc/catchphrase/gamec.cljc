@@ -1,5 +1,6 @@
 (ns catchphrase.gamec
-  (:require [c3kit.bucket.api :as db]
+  (:require [c3kit.apron.time :as time]
+            [c3kit.bucket.api :as db]
             [catchphrase.teamc :as teamc]))
 
 (defn create-game []
@@ -15,3 +16,10 @@
 (defn by-room [room]
   (let [game-room (db/ffind-by :game-room :room (:id room room))]
     (db/entity (:game game-room))))
+
+(def base-len (time/seconds 40))
+
+(defn start-round [game]
+  (assoc game :state :started
+              :round-start (time/now)
+              :round-length (+ base-len (time/seconds (rand-int 20)))))

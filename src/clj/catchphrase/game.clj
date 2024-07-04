@@ -1,5 +1,6 @@
 (ns catchphrase.game
-  (:require [c3kit.apron.time :as time]
+  (:require [c3kit.apron.corec :as ccc]
+            [c3kit.apron.time :as time]
             [catchphrase.gamec :as gamec]
             [catchphrase.occupantc :as occupantc]
             [catchphrase.room :as room]
@@ -37,12 +38,20 @@
   (when-not (= (:id occupant) (first (:occupants room)))
     (apic/fail nil "Only the host can start the game!")))
 
-(def base-len (time/seconds 40))
+(defn sleep! [ms] (Thread/sleep ms))
+
+(defn -run-round! [{:keys [round-length active-team] :as game}]
+  (sleep! round-length)
+  (with-lock
+    (let [teams (teamc/by-game game)
+          inactive-team (ccc/ffilter #(not= active-team (:id %)) teams)]
+      (db/tx (update inactive-team :points inc)))))
+
+(defn run-round! [game]
+  (future (-run-round! game)))
 
 (defn start-round! [game]
-  (db/tx (assoc game :state :started
-                     :round-start (time/now)
-                     :round-length (+ base-len (time/seconds (rand-int 20))))))
+  (db/tx (gamec/start-round game)))
 
 (defn ws-start-game [{:keys [connection-id] :as _request}]
   (with-lock
@@ -52,6 +61,7 @@
       (or (maybe-not-host room occupant)
           (let [game (start-round! game)]
             (room/push-to-room! room [game] :game/update)
+            (run-round! game)
             (apic/ok [game]))))))
 
 (defn inc-counter! [game]

@@ -30,13 +30,31 @@
     (context "success"
       (it "sends game with teams"
         (let [response (sut/ws-fetch-game {:connection-id (:conn-id @tf2/heavy)})
-              [red blu] (teamc/by-game @tf2/ctf)]
+              [blu red] (teamc/by-game @tf2/ctf)]
           (should= :ok (:status response))
-          (should= [@tf2/ctf red blu] (:payload response))))))
+          (should= [@tf2/ctf blu red] (:payload response))))))
+
+  (context "run-round!"
+
+    (redefs-around [sut/sleep! (stub :sleep!)
+                    dispatch/push-to-occupants! (stub :push-to-occupants!)])
+
+    (before (sut/start-round! @tf2/ctf))
+
+    (it "waits for round to end"
+      (sut/-run-round! @tf2/ctf)
+      (should-have-invoked :sleep! {:with [(:round-length @tf2/ctf)]}))
+
+    (it "it assigns points to non-active team"
+      (sut/-run-round! @tf2/ctf)
+      (let [[blu red] (teamc/by-game @tf2/ctf)]
+        (should= (:id blu) (:active-team @tf2/ctf))
+        (should= 1 (:points red)))))
 
   (context "ws-start-game"
 
-    (redefs-around [dispatch/push-to-occupants! (stub :push-to-occupants!)])
+    (redefs-around [dispatch/push-to-occupants! (stub :push-to-occupants!)
+                    sut/run-round! (stub :run-round!)])
 
     (it "fails is connection-id is not host"
       (let [non-host @tf2/scout
@@ -64,13 +82,14 @@
           (should= (time/seconds 50) (:round-length @game))
           (should= (time/seconds 50) (:round-length @tf2/ctf))))
 
-      (it "notified occupants of game start"
+      (it "notifies occupants of game start"
         @response
         (should-have-invoked :push-to-occupants! {:with [(map db/entity (:occupants @tf2/sawmill))
                                                          :game/update
                                                          [@tf2/ctf]]}))
-
-      ))
+      (it "runs round"
+        @response
+        (should-have-invoked :run-round! {:with [@tf2/ctf]}))))
 
   (context "ws-inc-counter"
     (context "failure"
