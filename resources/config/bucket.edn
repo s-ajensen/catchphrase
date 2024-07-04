@@ -1,0 +1,3 @@
+{:migrations-ns acme.db.migrations
+ :full-schema   acme.schema.full/full-schema
+ :config-var    acme.config/bucket}

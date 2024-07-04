@@ -1,0 +1,28 @@
+{
+ :paths     ["src/clj" "src/cljc" "src/cljs" "resources"]
+ :mvn/repos {"maven_central"  {:url "https://repo.maven.apache.org/maven2/"}}
+ :deps      {
+             com.cleancoders.c3kit/apron         {:git/url "git@github.com:cleancoders/c3kit-apron.git" :git/sha "5b71141c3f4a96af0b68841aa44e089ab59cb505"}
+             com.cleancoders.c3kit/bucket        {:git/url "git@github.com:cleancoders/c3kit-bucket.git" :git/sha "4c6ab21c20da27c9ab044cedfc1d0429ab49b507"}
+             com.cleancoders.c3kit/wire          {:git/url "git@github.com:cleancoders/c3kit-wire.git" :git/sha "19f87c52c6a7d80387cb26dd07a6c128d4a21ce5"}
+             compojure/compojure                                       {:mvn/version "1.7.0"}
+             org.clojure/clojure                                       {:mvn/version "1.11.1"}
+             }
+ :aliases   {
+             :test     {:extra-deps  {
+                                      clj-commons/secretary          {:mvn/version "1.2.4"}
+                                      com.cleancoders.c3kit/scaffold {:git/url "git@github.com:cleancoders/c3kit-scaffold.git" :git/sha "173ee966970a742e08c6718c58b5d8eed934a1e5"}
+                                      org.clojure/clojurescript      {:mvn/version "1.11.60"}
+                                      speclj/speclj                  {:mvn/version "3.4.5"}
+                                      venantius/accountant           {:mvn/version "0.2.5"}
+                                      }
+                        :extra-paths ["dev" "spec/clj" "spec/cljc" "spec/cljs"]}
+             :cljs     {:main-opts ["-m" "c3kit.scaffold.cljs"]}
+             :css      {:main-opts ["-m" "c3kit.scaffold.css"]}
+             :dev      {:main-opts ["-m" "acme.dev"]}
+             :dev-     {:main-opts ["-m" "acme.dev" "cljs" "css"]}
+             :repl     {:main-opts ["-e" "(require,'acme.repl)" "-e" "(in-ns,'acme.repl)" "--repl"] :extra-paths ["dev"]}
+             :run      {:main-opts ["-m" "acme.main"]}
+             :spec     {:main-opts ["-m" "speclj.main" "-c"]}
+             }
+ }
