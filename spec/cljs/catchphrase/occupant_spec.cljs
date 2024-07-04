@@ -1,6 +1,6 @@
 (ns catchphrase.occupant-spec
   (:require-macros [speclj.core :refer [redefs-around around stub should-have-invoked should-not-have-invoked with-stubs describe context it should= should-be-nil should-contain should should-not before should-not-be-nil]])
-  (:require [catchphrase.dark-souls :as ds]
+  (:require [catchphrase.tf2 :as tf2]
             [catchphrase.init :as init]
             [catchphrase.occupant :as sut]
             [c3kit.bucket.api :as db]
@@ -10,22 +10,22 @@
 (describe "Occupant"
   (init/install-reagent-db-atom!)
   (init/install-legend!)
-  (ds/with-schemas)
-  (before (ds/init))
+  (tf2/with-schemas)
+  (before (tf2/init))
 
   (context "installs"
     (it "frampt"
-      (sut/install! @ds/frampt)
-      (should= @ds/frampt @sut/current)
-      (should= (:nickname @ds/frampt) @sut/nickname))
+      (sut/install! @tf2/frampt)
+      (should= @tf2/frampt @sut/current)
+      (should= (:nickname @tf2/frampt) @sut/nickname))
 
     (it "lautrec"
-      (sut/install! @ds/lautrec)
-      (should= @ds/lautrec @sut/current)
-      (should= (:nickname @ds/lautrec) @sut/nickname)))
+      (sut/install! @tf2/lautrec)
+      (should= @tf2/lautrec @sut/current)
+      (should= (:nickname @tf2/lautrec) @sut/nickname)))
 
   (it "clears"
-    (sut/install! @ds/lautrec)
+    (sut/install! @tf2/lautrec)
     (sut/clear!)
     (should-be-nil @sut/current))
 
@@ -33,14 +33,14 @@
     (before (set! ws/client (reagent/atom {:connection {:id "conn-lautrec"}})))
 
     (it "transacts received entities"
-      (let [lautrec @ds/lautrec]
+      (let [lautrec @tf2/lautrec]
         (db/clear)
         (should-be-nil (db/entity (:id lautrec)))
         (sut/receive-join! [lautrec])
         (should-not-be-nil (db/entity (:id lautrec)))))
 
     (it "install occupant"
-      (let [lautrec @ds/lautrec]
+      (let [lautrec @tf2/lautrec]
         (db/clear)
         (should-be-nil @sut/current)
         (sut/receive-join! [lautrec])

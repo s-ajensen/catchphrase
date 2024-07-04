@@ -1,7 +1,7 @@
 (ns catchphrase.home-spec
   (:require-macros [speclj.core :refer [redefs-around around stub should-have-invoked should-not-have-invoked with-stubs describe context it should= should-be-nil should-contain should should-not before should-not-be-nil]])
   (:require [accountant.core :as accountant]
-            [catchphrase.dark-souls :as ds]
+            [catchphrase.tf2 :as tf2]
             [catchphrase.home :as sut]
             [catchphrase.layout :as layout]
             [catchphrase.routes :as routes]
@@ -16,7 +16,7 @@
   (wire/stub-ws)
   (stub-navigate!)
   (wire/with-root-dom)
-  (ds/with-schemas)
+  (tf2/with-schemas)
   (before (reset! state/nickname nil)
           (wire/render [layout/default])
           (routes/load-page! :home))

@@ -1,7 +1,7 @@
 (ns catchphrase.room-spec
   (:require [c3kit.bucket.api :as db]
             [c3kit.wire.apic :as apic]
-            [catchphrase.dark-souls :as ds :refer [firelink depths lautrec frampt patches]]
+            [catchphrase.tf2 :as tf2 :refer [firelink depths lautrec frampt patches]]
             [catchphrase.dispatch :as dispatch]
             [catchphrase.occupantc :as occupantc]
             [catchphrase.room :as sut]
@@ -12,7 +12,7 @@
 
 (describe "Room"
   (with-stubs)
-  (ds/init-with-schemas)
+  (tf2/init-with-schemas)
   (before (reset! idx 5))
   (redefs-around [rand-nth (stub :rand {:invoke (fn [coll]
                                                   (swap! idx inc)
@@ -61,7 +61,7 @@
         (should-be-nil (occupantc/by-nickname "Solaire"))))
 
     (it "joins room"
-      (let [response (sut/ws-join-room {:params        {:nickname "Sewer Rat" :room-code ds/depths-code}
+      (let [response (sut/ws-join-room {:params        {:nickname "Sewer Rat" :room-code tf2/depths-code}
                                         :connection-id "conn-rat"})]
         (should= :ok (:status response))
         (let [occupant (occupantc/by-nickname "Sewer Rat")]
@@ -70,7 +70,7 @@
           (should= "conn-rat" (:conn-id occupant)))))
 
     (it "notifies occupants of new room state"
-      (let [response (sut/ws-join-room {:params        {:nickname "Giant Crow" :room-code ds/firelink-code}
+      (let [response (sut/ws-join-room {:params        {:nickname "Giant Crow" :room-code tf2/firelink-code}
                                         :connection-id "conn-crow"})
             crow (occupantc/by-nickname "Giant Crow")]
         (should= :ok (:status response))
@@ -79,7 +79,7 @@
                                                          [@firelink crow]]})))
 
     (it "responds with current room state & all current occupants"
-      (let [response (sut/ws-join-room {:params        {:nickname "Giant Crow" :room-code ds/firelink-code}
+      (let [response (sut/ws-join-room {:params        {:nickname "Giant Crow" :room-code tf2/firelink-code}
                                         :connection-id "conn-crow"})
             crow (occupantc/by-nickname "Giant Crow")]
         (should= :ok (:status response))
@@ -107,7 +107,7 @@
       (sut/ws-leave-room {:connection-id "conn-patches"})
       (sut/ws-leave-room {:connection-id "conn-frampt"})
       (sut/ws-leave-room {:connection-id "conn-lautrec"})
-      (should-be-nil @ds/firelink)))
+      (should-be-nil @tf2/firelink)))
 
   (context "ws-fetch-room"
     (before (roomc/create-room! "depths"))
@@ -125,7 +125,7 @@
         (should= "Room does not exist!" (apic/flash-text response 0))))
 
     (it "fetches room"
-      (let [[_ crow] (:payload (sut/ws-join-room {:params {:nickname "Giant Crow" :room-code ds/depths-code}}))
-            response (sut/ws-fetch-room {:params {:room-code ds/depths-code}})]
+      (let [[_ crow] (:payload (sut/ws-join-room {:params {:nickname "Giant Crow" :room-code tf2/depths-code}}))
+            response (sut/ws-fetch-room {:params {:room-code tf2/depths-code}})]
         (should= :ok (:status response))
-        (should= [@ds/depths crow] (:payload response))))))
+        (should= [@tf2/depths crow] (:payload response))))))

@@ -3,7 +3,7 @@
                    [c3kit.wire.spec-helperc :refer [should-not-select should-select]])
   (:require [catchphrase.occupant :as occupant]
             [c3kit.apron.corec :as ccc]
-            [catchphrase.dark-souls :as ds]
+            [catchphrase.tf2 :as tf2]
             [catchphrase.init :as init]
             [catchphrase.page :as page]
             [catchphrase.room :as sut]
@@ -28,10 +28,10 @@
   (with-stubs)
   (wire/stub-ws)
   (wire/with-root-dom)
-  (ds/with-schemas)
+  (tf2/with-schemas)
   (before (db/set-safety! false)
           (db/clear)
-          (ds/init)
+          (tf2/init)
           (occupant/clear!)
           (wire/render [layout/default]))
 
@@ -39,29 +39,29 @@
     (before (routes/load-page! nil))
 
     (it "fetches room"
-      (load-room! @ds/firelink)
-      (should-have-invoked :ws/call! {:with [:room/fetch {:room-code ds/firelink-code} db/tx*]}))
+      (load-room! @tf2/firelink)
+      (should-have-invoked :ws/call! {:with [:room/fetch {:room-code tf2/firelink-code} db/tx*]}))
 
     (it "joins room if non-blank nickname"
       (reset! state/nickname "Hello")
-      (load-room! @ds/firelink)
+      (load-room! @tf2/firelink)
       (should-have-invoked :ws/call! {:with [:room/join
-                                             {:nickname "Hello" :room-code ds/firelink-code}
+                                             {:nickname "Hello" :room-code tf2/firelink-code}
                                              occupant/receive-join!]}))
 
     (it "doesn't join room if blank nickname"
       (reset! state/nickname " ")
-      (load-room! @ds/firelink)
+      (load-room! @tf2/firelink)
       (should-not-have-invoked :ws/call! {:with [:room/join
-                                                 {:nickname " " :room-code ds/firelink-code}
+                                                 {:nickname " " :room-code tf2/firelink-code}
                                                  occupant/receive-join!]}))
 
     (it "deletes rooms"
-      (load-room! @ds/firelink)
+      (load-room! @tf2/firelink)
       (should= [] (db/find :room)))
 
     (it "deletes games"
-      (load-room! @ds/firelink)
+      (load-room! @tf2/firelink)
       (should= [] (db/find :game))))
 
   (context "on exit"
@@ -80,12 +80,12 @@
       (should-select "#-not-found"))
 
     (it "renders prompt or room if room"
-      (load-room! @ds/firelink)
+      (load-room! @tf2/firelink)
       (wire/flush)
       (should-select "#-prompt-or-room")))
 
   (context "existing room"
-    (before (load-room! @ds/firelink))
+    (before (load-room! @tf2/firelink))
 
     (context "nickname prompt or room"
       (it "renders nickname prompt if no nickname"
@@ -94,7 +94,7 @@
 
       (it "renders room if nickname"
         (stub/clear!)
-        (occupant/install! @ds/frampt)
+        (occupant/install! @tf2/frampt)
         (wire/flush)
         (should-have-invoked :ws/call! {:with [:game/fetch nil db/tx]})
         (should-not-select "#-nickname-prompt")
@@ -112,7 +112,7 @@
           (wire/change! "#-nickname-input" "Lautrec")
           (wire/click! "#-join-button")
           (should-have-invoked :ws/call! {:with [:room/join
-                                                 {:nickname "Lautrec" :room-code ds/firelink-code}
+                                                 {:nickname "Lautrec" :room-code tf2/firelink-code}
                                                  occupant/receive-join!]}))
 
         (it "doesn't join room if blank nickname"
@@ -121,22 +121,22 @@
           (should-not-have-invoked :ws/call!))))
 
     (context "room"
-      (before (occupant/install! @ds/lautrec)
+      (before (occupant/install! @tf2/lautrec)
               (wire/flush))
 
       (context "displays occupants"
 
         (it "with one occupant"
-          (let [lautrec @ds/lautrec]
+          (let [lautrec @tf2/lautrec]
             (run! db/delete (db/find :occupant))
             (db/tx lautrec)
             (wire/flush)
             (should= "Lautrec" (wire/html (str "#-occupant-" (:id lautrec))))))
 
         (it "with multiple occupants"
-          (should= "Lautrec" (wire/html (str "#-occupant-" (:id @ds/lautrec-atom))))
-          (should= "Kingseeker Frampt" (wire/html (str "#-occupant-" (:id @ds/frampt-atom))))
-          (should= "Patches" (wire/html (str "#-occupant-" (:id @ds/patches))))))
+          (should= "Lautrec" (wire/html (str "#-occupant-" (:id @tf2/lautrec-atom))))
+          (should= "Kingseeker Frampt" (wire/html (str "#-occupant-" (:id @tf2/frampt-atom))))
+          (should= "Patches" (wire/html (str "#-occupant-" (:id @tf2/patches))))))
 
       (it "displays game"
         (should-select "#-game-container"))))

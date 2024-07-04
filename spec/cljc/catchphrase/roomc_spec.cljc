@@ -1,6 +1,6 @@
 (ns catchphrase.roomc-spec
   (:require [c3kit.bucket.api :as db]
-            [catchphrase.dark-souls :as ds :refer [firelink depths lautrec laurentius frampt patches]]
+            [catchphrase.tf2 :as tf2 :refer [firelink depths lautrec laurentius frampt patches]]
             [catchphrase.roomc :as roomc]
             [catchphrase.roomc :as sut]
             [speclj.core #?(:clj :refer :cljs :refer-macros) [describe context focus-it it should= should-not-contain
@@ -8,12 +8,12 @@
 
 (describe "roomc"
   (with-stubs)
-  (ds/init-with-schemas)
+  (tf2/init-with-schemas)
 
   (context "create-room!"
     (it "assigns code"
-      (sut/create-room! ds/firelink-code)
-      (should= ds/firelink-code (:code (db/ffind-by :room :code ds/firelink-code)))))
+      (sut/create-room! tf2/firelink-code)
+      (should= tf2/firelink-code (:code (db/ffind-by :room :code tf2/firelink-code)))))
 
   (context "add-occupant"
     (it "to empty room"

@@ -1,7 +1,7 @@
 (ns catchphrase.game-spec
   (:require-macros [speclj.core :refer [redefs-around around stub should-have-invoked should-not-have-invoked with-stubs describe context it should= should-be-nil should-contain should should-not before should-not-be-nil]]
                    [c3kit.wire.spec-helperc :refer [should-have-invoked-ws should-not-select should-select]])
-  (:require [catchphrase.dark-souls :as ds]
+  (:require [catchphrase.tf2 :as tf2]
             [catchphrase.game :as sut]
             [catchphrase.init :as init]
             [c3kit.apron.corec :as ccc]
@@ -16,9 +16,9 @@
   (with-stubs)
   (wire/stub-ws)
   (wire/with-root-dom)
-  (ds/with-schemas)
+  (tf2/with-schemas)
   (before (db/set-safety! false)
-          (ds/init)
+          (tf2/init)
           (wire/render [sut/game]))
 
   (it "stucture"
@@ -32,6 +32,6 @@
     (should-have-invoked-ws :game/inc-counter [] ccc/noop))
 
   (it "receives game update"
-    (ws/push-handler {:kind :game/update :params (update @ds/dark-souls :counter inc)})
+    (ws/push-handler {:kind :game/update :params (update @tf2/dark-souls :counter inc)})
     (wire/flush)
     (should= "1" (wire/text "#-counter"))))

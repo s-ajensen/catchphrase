@@ -1,10 +1,10 @@
 (ns catchphrase.occupantc_spec
   (:require [catchphrase.occupantc :as sut]
-            [catchphrase.dark-souls :as ds]
+            [catchphrase.tf2 :as tf2]
             [speclj.core #?(:clj :refer :cljs :refer-macros) [describe context it should=]]))
 
 (describe "occupantc"
-  (ds/init-with-schemas)
+  (tf2/init-with-schemas)
 
   (it "constructor"
     (let [occupant (sut/->occupant "Lautrec" "conn-id")]

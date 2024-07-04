@@ -1,4 +1,4 @@
-(ns catchphrase.dark-souls
+(ns catchphrase.tf2
   (:require [catchphrase.schema.full :as schema]
             [c3kit.bucket.api :as db]
             [c3kit.bucket.spec-helperc :as helperc]

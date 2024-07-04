@@ -1,13 +1,13 @@
 (ns catchphrase.dispatch-spec
   (:require [c3kit.apron.corec :as ccc]
             [c3kit.wire.websocket :as ws]
-            [catchphrase.dark-souls :as ds :refer [firelink lautrec frampt patches]]
+            [catchphrase.tf2 :as tf2 :refer [firelink lautrec frampt patches]]
             [catchphrase.dispatch :as sut]
             [speclj.core :refer :all]))
 
 (describe "Dispatch"
   (with-stubs)
-  (ds/init-with-schemas)
+  (tf2/init-with-schemas)
 
   (context "pushing"
     (redefs-around [ws/connected-ids (fn [] (set (map :conn-id [@lautrec @frampt @patches])))
