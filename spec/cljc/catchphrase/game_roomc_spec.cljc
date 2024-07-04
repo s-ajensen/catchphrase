@@ -12,6 +12,12 @@
 
   (context "create-game-room!"
 
+    (it "sets BLU to be the active team"
+      (let [game-room (sut/create-game-room! "sawmill")
+            game (db/entity (:game game-room))
+            blu (db/ffind-by :team :game (:id game) :color :blu)]
+        (should= (:id blu) (:active-team game))))
+
     (it "assigns 0 points for both teams"
       (let [game-room (sut/create-game-room! "sawmill")
             red (db/ffind-by :team :game (:game game-room) :color :red)

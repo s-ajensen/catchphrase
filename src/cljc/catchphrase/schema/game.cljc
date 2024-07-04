@@ -6,6 +6,7 @@
    :id           s/id
 
    :state        {:type :keyword}
+   :active-team  {:type :ref}
    :round-start  {:type :instant}
    :round-length {:type :long}
 

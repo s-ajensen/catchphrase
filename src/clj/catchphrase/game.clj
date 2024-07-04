@@ -8,6 +8,11 @@
             [c3kit.wire.apic :as apic]
             [catchphrase.teamc :as teamc]))
 
+(def lock (Object.))
+(defmacro with-lock [& body]
+  `(locking lock
+     ~@body))
+
 (defn maybe-occupant-not-found [occupant]
   (when-not occupant (apic/fail {} "Occupant not found")))
 
@@ -39,14 +44,15 @@
                      :round-start (time/now)
                      :round-length (+ base-len (time/seconds (rand-int 20))))))
 
-(defn ws-start-game [{:keys [connection-id] :as request}]
-  (let [occupant (occupantc/by-conn-id connection-id)
-        room     (roomc/by-occupant occupant)
-        game     (gamec/by-room room)]
-    (or (maybe-not-host room occupant)
-        (let [game (start-round! game)]
-          (room/push-to-room! room [game] :game/update)
-          (apic/ok [game])))))
+(defn ws-start-game [{:keys [connection-id] :as _request}]
+  (with-lock
+    (let [occupant (occupantc/by-conn-id connection-id)
+          room (roomc/by-occupant occupant)
+          game (gamec/by-room room)]
+      (or (maybe-not-host room occupant)
+          (let [game (start-round! game)]
+            (room/push-to-room! room [game] :game/update)
+            (apic/ok [game]))))))
 
 (defn inc-counter! [game]
   (db/tx (update game :counter inc)))
