@@ -1,7 +1,7 @@
 {
- :source-dir  "dev/acme/styles"
- :var         acme.styles.main/screen
- :output-file "resources/public/css/acme.css"
+ :source-dir  "dev/catchphrase/styles"
+ :var         catchphrase.styles.main/screen
+ :output-file "resources/public/css/catchphrase.css"
  :flags       {:pretty-print? true
                :vendors       ["webkit" "moz" "o"]}
  }

@@ -19,10 +19,10 @@
                         :extra-paths ["dev" "spec/clj" "spec/cljc" "spec/cljs"]}
              :cljs     {:main-opts ["-m" "c3kit.scaffold.cljs"]}
              :css      {:main-opts ["-m" "c3kit.scaffold.css"]}
-             :dev      {:main-opts ["-m" "acme.dev"]}
-             :dev-     {:main-opts ["-m" "acme.dev" "cljs" "css"]}
-             :repl     {:main-opts ["-e" "(require,'acme.repl)" "-e" "(in-ns,'acme.repl)" "--repl"] :extra-paths ["dev"]}
-             :run      {:main-opts ["-m" "acme.main"]}
+             :dev      {:main-opts ["-m" "catchphrase.dev"]}
+             :dev-     {:main-opts ["-m" "catchphrase.dev" "cljs" "css"]}
+             :repl     {:main-opts ["-e" "(require,'catchphrase.repl)" "-e" "(in-ns,'catchphrase.repl)" "--repl"] :extra-paths ["dev"]}
+             :run      {:main-opts ["-m" "catchphrase.main"]}
              :spec     {:main-opts ["-m" "speclj.main" "-c"]}
              }
  }

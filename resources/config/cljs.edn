@@ -1,11 +1,11 @@
-{:ns-prefix   "acme"
+{:ns-prefix   "catchphrase"
  :ignore-errors ["goog/i18n/bidi.js"]
  :env-keys    ["cc.env" "CC_ENV"]
  :run-cmd     "node resources/public/specs/speclj.js"
  :development {:cache-analysis true
                :optimizations  :none
                :output-dir     "resources/public/cljs/"
-               :output-to      "resources/public/cljs/acme_dev.js"
+               :output-to      "resources/public/cljs/catchphrase_dev.js"
                :pretty-print   true
                :source-map     true
                :sources        ["spec/cljc" "spec/cljs" "src/cljc" "src/cljs"]
@@ -16,11 +16,11 @@
                }
  :production  {
                :cache-analysis false
-               :externs        ["dev/acme/externs/gapi.js"]
+               :externs        ["dev/catchphrase/externs/gapi.js"]
                :infer-externs  true
                :optimizations  :advanced
                :output-dir     "resources/public/cljs/"
-               :output-to      "resources/public/cljs/acme.js"
+               :output-to      "resources/public/cljs/catchphrase.js"
                :pretty-print   false
                :sources        ["src/cljc" "src/cljs"]
                :specs          false
@@ -31,7 +31,7 @@
                :infer-externs  true
                :optimizations  :whitespace
                :output-dir     "resources/public/cljs/"
-               :output-to      "resources/public/cljs/acme.js"
+               :output-to      "resources/public/cljs/catchphrase.js"
                :pretty-print   true
                :pseudo-names   true
                :sources        ["src/cljc" "src/cljs"]
