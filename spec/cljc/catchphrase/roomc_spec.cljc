@@ -1,6 +1,6 @@
 (ns catchphrase.roomc-spec
   (:require [c3kit.bucket.api :as db]
-            [catchphrase.tf2 :as tf2 :refer [firelink depths lautrec laurentius frampt patches]]
+            [catchphrase.tf2 :as tf2 :refer [sawmill egypt heavy spy medic scout]]
             [catchphrase.roomc :as roomc]
             [catchphrase.roomc :as sut]
             [speclj.core #?(:clj :refer :cljs :refer-macros) [describe context focus-it it should= should-not-contain
@@ -12,8 +12,8 @@
 
   (context "create-room!"
     (it "assigns code"
-      (sut/create-room! tf2/firelink-code)
-      (should= tf2/firelink-code (:code (db/ffind-by :room :code tf2/firelink-code)))))
+      (sut/create-room! tf2/sawmill-code)
+      (should= tf2/sawmill-code (:code (db/ffind-by :room :code tf2/sawmill-code)))))
 
   (context "add-occupant"
     (it "to empty room"
@@ -30,10 +30,10 @@
 
   (context "join-room!"
     (it "stores users who have joined in order"
-      (sut/add-occupant! @depths @laurentius)
-      (sut/add-occupant! @depths @frampt)
-      (sut/add-occupant! @depths @patches)
-      (should= (mapv :id [@laurentius @frampt @patches]) (:occupants @depths))))
+      (sut/add-occupant! @egypt @spy)
+      (sut/add-occupant! @egypt @medic)
+      (sut/add-occupant! @egypt @scout)
+      (should= (mapv :id [@spy @medic @scout]) (:occupants @egypt))))
 
   (context "remove-occupant"
     (it "from empty room"
@@ -50,8 +50,8 @@
 
   (context "remove-occupant!"
     (it "removes occupant from room"
-      (sut/remove-occupant! @firelink @patches)
-      (should-not-contain (:id @patches) (:occupants @firelink))))
+      (sut/remove-occupant! @sawmill @scout)
+      (should-not-contain (:id @scout) (:occupants @sawmill))))
 
   (it "finds room by occupant"
-    (should= @firelink (roomc/by-occupant @lautrec))))
+    (should= @sawmill (roomc/by-occupant @heavy))))

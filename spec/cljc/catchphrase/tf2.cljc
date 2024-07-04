@@ -8,41 +8,41 @@
             [speclj.core #?(:clj :refer :cljs :refer-macros) [before]])
   #?(:clj (:import (clojure.lang IDeref))))
 
-(def firelink-code "shrine")
-(def depths-code "depths")
+(def sawmill-code "shrine")
+(def egypt-code "depths")
 
-(def firelink-atom (atom nil))
-(def lautrec-atom (atom nil))
-(def frampt-atom (atom nil))
-(def patches-atom (atom nil))
-(def laurentius-atom (atom nil))
-(def depths-atom (atom nil))
-(def dark-souls-atom (atom nil))
+(def sawmill-atom (atom nil))
+(def heavy-atom (atom nil))
+(def medic-atom (atom nil))
+(def scout-atom (atom nil))
+(def spy-atom (atom nil))
+(def egypt-atom (atom nil))
+(def koth-atom (atom nil))
 
 (deftype Entity [atm]
   #?(:clj IDeref :cljs cljs.core/IDeref)
   (#?(:clj deref :cljs -deref) [this] (db/reload @atm)))
 
-(def firelink (Entity. firelink-atom))                      ;; a populated room
-(def lautrec (Entity. lautrec-atom))                        ;; a occupant at firelink
-(def frampt (Entity. frampt-atom))                          ;; a occupant at firelink
-(def patches (Entity. patches-atom))                        ;; a occupant at firelink
-(def laurentius (Entity. laurentius-atom))                  ;; a occupant who hasn't joined
-(def depths (Entity. depths-atom))                          ;; an empty room
-(def dark-souls (Entity. dark-souls-atom))                  ;; a game for firelink
+(def sawmill (Entity. sawmill-atom))                        ;; a populated room
+(def heavy (Entity. heavy-atom))                            ;; a occupant at firelink
+(def medic (Entity. medic-atom))                            ;; a occupant at firelink
+(def scout (Entity. scout-atom))                            ;; a occupant at firelink
+(def spy (Entity. spy-atom))                                ;; a occupant who hasn't joined
+(def egypt (Entity. egypt-atom))                            ;; an empty room
+(def koth (Entity. koth-atom))                              ;; a game for firelink
 
 (defn init []
-  (reset! firelink-atom (roomc/create-room! firelink-code))
-  (reset! depths-atom (roomc/create-room! depths-code))
-  (reset! lautrec-atom (db/tx (occuantc/->occupant "Lautrec" "conn-lautrec")))
-  (reset! frampt-atom (db/tx (occuantc/->occupant "Kingseeker Frampt" "conn-frampt")))
-  (reset! patches-atom (db/tx (occuantc/->occupant "Patches" "conn-patches")))
-  (reset! laurentius-atom (db/tx (occuantc/->occupant "Laurentius" "conn-laurentius")))
-  (reset! dark-souls-atom (db/tx {:kind :game :room (:id @firelink) :counter 0}))
-  (roomc/add-occupant! @firelink @lautrec)
-  (roomc/add-occupant! @firelink @frampt)
-  (roomc/add-occupant! @firelink @patches)
-  (db/tx {:kind :game-room :game (:id @dark-souls) :room (:id @firelink)}))
+  (reset! sawmill-atom (roomc/create-room! sawmill-code))
+  (reset! egypt-atom (roomc/create-room! egypt-code))
+  (reset! heavy-atom (db/tx (occuantc/->occupant "Lautrec" "conn-lautrec")))
+  (reset! medic-atom (db/tx (occuantc/->occupant "Kingseeker Frampt" "conn-frampt")))
+  (reset! scout-atom (db/tx (occuantc/->occupant "Patches" "conn-patches")))
+  (reset! spy-atom (db/tx (occuantc/->occupant "Laurentius" "conn-laurentius")))
+  (reset! koth-atom (db/tx {:kind :game :room (:id @sawmill) :counter 0}))
+  (roomc/add-occupant! @sawmill @heavy)
+  (roomc/add-occupant! @sawmill @medic)
+  (roomc/add-occupant! @sawmill @scout)
+  (db/tx {:kind :game-room :game (:id @koth) :room (:id @sawmill)}))
 
 (def memory-config {:impl :memory :store #?(:clj (atom nil) :cljs (reagent/atom nil))})
 
@@ -52,4 +52,4 @@
 
 (defn init-with-schemas []
   (list (with-schemas)
-    (before (init))))
+        (before (init))))

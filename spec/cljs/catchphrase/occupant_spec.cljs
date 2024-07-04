@@ -15,17 +15,17 @@
 
   (context "installs"
     (it "frampt"
-      (sut/install! @tf2/frampt)
-      (should= @tf2/frampt @sut/current)
-      (should= (:nickname @tf2/frampt) @sut/nickname))
+      (sut/install! @tf2/medic)
+      (should= @tf2/medic @sut/current)
+      (should= (:nickname @tf2/medic) @sut/nickname))
 
     (it "lautrec"
-      (sut/install! @tf2/lautrec)
-      (should= @tf2/lautrec @sut/current)
-      (should= (:nickname @tf2/lautrec) @sut/nickname)))
+      (sut/install! @tf2/heavy)
+      (should= @tf2/heavy @sut/current)
+      (should= (:nickname @tf2/heavy) @sut/nickname)))
 
   (it "clears"
-    (sut/install! @tf2/lautrec)
+    (sut/install! @tf2/heavy)
     (sut/clear!)
     (should-be-nil @sut/current))
 
@@ -33,14 +33,14 @@
     (before (set! ws/client (reagent/atom {:connection {:id "conn-lautrec"}})))
 
     (it "transacts received entities"
-      (let [lautrec @tf2/lautrec]
+      (let [lautrec @tf2/heavy]
         (db/clear)
         (should-be-nil (db/entity (:id lautrec)))
         (sut/receive-join! [lautrec])
         (should-not-be-nil (db/entity (:id lautrec)))))
 
     (it "install occupant"
-      (let [lautrec @tf2/lautrec]
+      (let [lautrec @tf2/heavy]
         (db/clear)
         (should-be-nil @sut/current)
         (sut/receive-join! [lautrec])

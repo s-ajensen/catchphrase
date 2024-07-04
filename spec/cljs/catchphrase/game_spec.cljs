@@ -32,6 +32,6 @@
     (should-have-invoked-ws :game/inc-counter [] ccc/noop))
 
   (it "receives game update"
-    (ws/push-handler {:kind :game/update :params (update @tf2/dark-souls :counter inc)})
+    (ws/push-handler {:kind :game/update :params (update @tf2/koth :counter inc)})
     (wire/flush)
     (should= "1" (wire/text "#-counter"))))

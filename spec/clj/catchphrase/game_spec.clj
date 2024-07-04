@@ -18,15 +18,15 @@
           (should= "Occupant not found" (apic/flash-text response 0))))
 
       (it "if room not found"
-        (let [response (sut/ws-fetch-game {:connection-id (:conn-id @tf2/laurentius)})]
+        (let [response (sut/ws-fetch-game {:connection-id (:conn-id @tf2/spy)})]
           (should= :fail (:status response))
           (should= "Room not found" (apic/flash-text response 0)))))
 
     (context "success"
       (it "sends game"
-        (let [response (sut/ws-fetch-game {:connection-id (:conn-id @tf2/lautrec)})]
+        (let [response (sut/ws-fetch-game {:connection-id (:conn-id @tf2/heavy)})]
           (should= :ok (:status response))
-          (should= @tf2/dark-souls (:payload response))))))
+          (should= @tf2/koth (:payload response))))))
 
   (context "ws-inc-counter"
     (context "failure"
@@ -36,14 +36,14 @@
           (should= "Occupant not found" (apic/flash-text response 0))))
 
       (it "if room not found"
-        (let [response (sut/ws-inc-counter {:connection-id (:conn-id @tf2/laurentius)})]
+        (let [response (sut/ws-inc-counter {:connection-id (:conn-id @tf2/spy)})]
           (should= :fail (:status response))
           (should= "Room not found" (apic/flash-text response 0))))
 
       (it "if game not found"
         (db/delete-all :game)
         (db/delete-all :game-room)
-        (let [response (sut/ws-inc-counter {:connection-id (:conn-id @tf2/lautrec)})]
+        (let [response (sut/ws-inc-counter {:connection-id (:conn-id @tf2/heavy)})]
           (should= :fail (:status response))
           (should= "Game not found" (apic/flash-text response 0)))))
 
@@ -51,14 +51,14 @@
       (redefs-around [dispatch/push-to-connections! (stub :push-to-connections!)])
 
       (it "updates counter"
-        (let [response (sut/ws-inc-counter {:connection-id (:conn-id @tf2/lautrec)})]
+        (let [response (sut/ws-inc-counter {:connection-id (:conn-id @tf2/heavy)})]
           (should= :ok (:status response))
-          (should= 1 (:counter (db/entity (:id @tf2/dark-souls))))))
+          (should= 1 (:counter (db/entity (:id @tf2/koth))))))
 
       (it "dispatches to occupants"
-        (let [game     @tf2/dark-souls
-              response (sut/ws-inc-counter {:connection-id (:conn-id @tf2/lautrec)})]
+        (let [game     @tf2/koth
+              response (sut/ws-inc-counter {:connection-id (:conn-id @tf2/heavy)})]
           (should= :ok (:status response))
-          (should-have-invoked :push-to-connections! {:with [(map (comp :conn-id db/entity) (:occupants @tf2/firelink))
+          (should-have-invoked :push-to-connections! {:with [(map (comp :conn-id db/entity) (:occupants @tf2/sawmill))
                                                              :game/update
                                                              (update game :counter inc)]}))))))

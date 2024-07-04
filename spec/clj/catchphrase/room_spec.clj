@@ -1,7 +1,7 @@
 (ns catchphrase.room-spec
   (:require [c3kit.bucket.api :as db]
             [c3kit.wire.apic :as apic]
-            [catchphrase.tf2 :as tf2 :refer [firelink depths lautrec frampt patches]]
+            [catchphrase.tf2 :as tf2 :refer [sawmill egypt heavy medic scout]]
             [catchphrase.dispatch :as dispatch]
             [catchphrase.occupantc :as occupantc]
             [catchphrase.room :as sut]
@@ -61,37 +61,37 @@
         (should-be-nil (occupantc/by-nickname "Solaire"))))
 
     (it "joins room"
-      (let [response (sut/ws-join-room {:params        {:nickname "Sewer Rat" :room-code tf2/depths-code}
+      (let [response (sut/ws-join-room {:params        {:nickname "Sewer Rat" :room-code tf2/egypt-code}
                                         :connection-id "conn-rat"})]
         (should= :ok (:status response))
         (let [occupant (occupantc/by-nickname "Sewer Rat")]
           (should-not-be-nil occupant)
-          (should= [@depths occupant] (:payload response))
+          (should= [@egypt occupant] (:payload response))
           (should= "conn-rat" (:conn-id occupant)))))
 
     (it "notifies occupants of new room state"
-      (let [response (sut/ws-join-room {:params        {:nickname "Giant Crow" :room-code tf2/firelink-code}
+      (let [response (sut/ws-join-room {:params        {:nickname "Giant Crow" :room-code tf2/sawmill-code}
                                         :connection-id "conn-crow"})
             crow (occupantc/by-nickname "Giant Crow")]
         (should= :ok (:status response))
-        (should-have-invoked :push-to-occupants! {:with [(map db/entity (:occupants @firelink))
+        (should-have-invoked :push-to-occupants! {:with [(map db/entity (:occupants @sawmill))
                                                          :room/update
-                                                         [@firelink crow]]})))
+                                                         [@sawmill crow]]})))
 
     (it "responds with current room state & all current occupants"
-      (let [response (sut/ws-join-room {:params        {:nickname "Giant Crow" :room-code tf2/firelink-code}
+      (let [response (sut/ws-join-room {:params        {:nickname "Giant Crow" :room-code tf2/sawmill-code}
                                         :connection-id "conn-crow"})
             crow (occupantc/by-nickname "Giant Crow")]
         (should= :ok (:status response))
-        (should= (set [@firelink crow @lautrec @frampt @patches]) (set (:payload response))))))
+        (should= (set [@sawmill crow @heavy @medic @scout]) (set (:payload response))))))
 
   (context "ws-leave-room"
     (redefs-around [dispatch/push-to-occupants! (stub :push-to-occupants!)])
 
     (it "removes occupant from room"
       (sut/ws-leave-room {:connection-id "conn-patches"})
-      (should-not-contain (:id @patches) (:occupants @firelink))
-      (should= (mapv :id [@lautrec @frampt]) (:occupants @firelink)))
+      (should-not-contain (:id @scout) (:occupants @sawmill))
+      (should= (mapv :id [@heavy @medic]) (:occupants @sawmill)))
 
     (it "removes occupant from db"
       (sut/ws-leave-room {:connection-id "conn-patches"})
@@ -99,15 +99,15 @@
 
     (it "notifies occupants of new room state"
       (sut/ws-leave-room {:connection-id "conn-patches"})
-      (should-have-invoked :push-to-occupants! {:with [(map db/entity (:occupants @firelink))
+      (should-have-invoked :push-to-occupants! {:with [(map db/entity (:occupants @sawmill))
                                                        :room/update
-                                                       [@firelink]]}))
+                                                       [@sawmill]]}))
 
     (it "deletes room if last person leaves"
       (sut/ws-leave-room {:connection-id "conn-patches"})
       (sut/ws-leave-room {:connection-id "conn-frampt"})
       (sut/ws-leave-room {:connection-id "conn-lautrec"})
-      (should-be-nil @tf2/firelink)))
+      (should-be-nil @tf2/sawmill)))
 
   (context "ws-fetch-room"
     (before (roomc/create-room! "depths"))
@@ -125,7 +125,7 @@
         (should= "Room does not exist!" (apic/flash-text response 0))))
 
     (it "fetches room"
-      (let [[_ crow] (:payload (sut/ws-join-room {:params {:nickname "Giant Crow" :room-code tf2/depths-code}}))
-            response (sut/ws-fetch-room {:params {:room-code tf2/depths-code}})]
+      (let [[_ crow] (:payload (sut/ws-join-room {:params {:nickname "Giant Crow" :room-code tf2/egypt-code}}))
+            response (sut/ws-fetch-room {:params {:room-code tf2/egypt-code}})]
         (should= :ok (:status response))
-        (should= [@tf2/depths crow] (:payload response))))))
+        (should= [@tf2/egypt crow] (:payload response))))))
