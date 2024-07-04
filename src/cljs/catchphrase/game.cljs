@@ -13,7 +13,7 @@
    [:button#-inc-btn
     {:on-click #(ws/call! :game/inc-counter [] ccc/noop)}
     "Click me!"]
-   (when @state/host?
+   (when (state/host?)
      [:button#-start-button
       {:on-click #(ws/call! :game/start nil db/tx*)}
       "Start Game"])])

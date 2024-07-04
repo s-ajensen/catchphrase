@@ -50,7 +50,7 @@
     [:li
      {:key (:id occupant)
       :id  (str "-" prefix "-" (:id occupant))}
-     (:nickname occupant)])])
+     (str (:nickname occupant) (when (state/host? occupant) " (Host)"))])])
 
 (defn room-component []
   (reagent/create-class

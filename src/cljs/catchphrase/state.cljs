@@ -13,4 +13,8 @@
 (def room (reagent/track #(db/ffind-by :room :code @code)))
 (def occupants (reagent/track #(map db/entity (:occupants @room))))
 (def game (reagent/track #(db/ffind :game)))
-(def host? (reagent/track #(= @occupant/occupant-id (:id (first @occupants)))))
+(defn host?
+  ([]
+   (host? @occupant/occupant-id))
+  ([occupant]
+   (= (:id occupant occupant) (:id (first @occupants)))))

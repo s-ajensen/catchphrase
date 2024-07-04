@@ -126,7 +126,7 @@
 
       (context "displays teams"
         (it "blu"
-          (should= "heavy" (wire/html (str "#-blu-" (:id @tf2/heavy))))
+          (should= "heavy (Host)" (wire/html (str "#-blu-" (:id @tf2/heavy))))
           (should= "scout" (wire/html (str "#-blu-" (:id @tf2/scout)))))
 
         (it "red"
