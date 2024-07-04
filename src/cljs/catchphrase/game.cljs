@@ -12,4 +12,8 @@
    [:p#-counter.text-align-center (:counter @state/game)]
    [:button#-inc-btn
     {:on-click #(ws/call! :game/inc-counter [] ccc/noop)}
-    "Click me!"]])
+    "Click me!"]
+   (when @state/host?
+     [:button#-start-button
+      {:on-click #(ws/call! :game/start nil db/tx*)}
+      "Start Game"])])

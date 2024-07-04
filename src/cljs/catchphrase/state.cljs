@@ -1,5 +1,6 @@
 (ns catchphrase.state
   (:require [c3kit.bucket.api :as db]
+            [catchphrase.occupant :as occupant]
             [catchphrase.page :as page]
             [reagent.core :as reagent]))
 
@@ -12,4 +13,4 @@
 (def room (reagent/track #(db/ffind-by :room :code @code)))
 (def occupants (reagent/track #(map db/entity (:occupants @room))))
 (def game (reagent/track #(db/ffind :game)))
-
+(def host? (reagent/track #(= @occupant/occupant-id (:id (first @occupants)))))
