@@ -19,7 +19,7 @@
   (let [game-room (db/ffind-by :game-room :room (:id room room))]
     (db/entity (:game game-room))))
 
-(def base-len (time/seconds 40))
+(def base-len (time/seconds 100))
 
 (defn start-round [game]
   (assoc game :state :started
