@@ -26,3 +26,18 @@
 
 (defn stop-round [game]
   (assoc game :state :round-end))
+
+(defn id= [a b]
+  (= (:id a) (:id b)))
+
+(defn team= [a b]
+  (= (:team a) (:team b)))
+
+(defn next-occupant [occupants current-occupant]
+  (if-not current-occupant
+    (first occupants)
+    (->> occupants
+         cycle
+         (drop-while #(not (id= current-occupant %)))
+         (drop-while #(team= current-occupant %))
+         first)))
