@@ -55,6 +55,7 @@
   (test-webs :room/fetch           catchphrase.room/ws-fetch-room)
   (test-webs :game/fetch           catchphrase.game/ws-fetch-game)
   (test-webs :game/start           catchphrase.game/ws-start-game)
+  (test-webs :game/advance         catchphrase.game/ws-advance-game)
   (test-webs :game/inc-counter     catchphrase.game/ws-inc-counter)
 
   (it "not-found global - nil - handled by http"

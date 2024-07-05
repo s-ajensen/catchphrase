@@ -105,6 +105,33 @@
         @response
         (should-have-invoked :run-round! {:with [@tf2/ctf @tf2/sawmill]}))))
 
+  (context "ws-advance-game"
+    (before (sut/start-round! @tf2/ctf))
+    (redefs-around [dispatch/push-to-occupants! (stub :push-to-occupants!)])
+
+    (it "fails if occupant isn't the active occupant of the game"
+      (let [non-active @tf2/scout
+            response (sut/ws-advance-game {:connection-id (:conn-id non-active)})]
+        (should= :fail (:status response))
+        (should-be-nil (:payload response))
+        (should= "You can only advance the game if it is your turn!" (apic/flash-text response 0))))
+
+    (context "success"
+      (it "updates the game's active occupant"
+        (let [active @tf2/heavy
+              old-game @tf2/ctf
+              response (sut/ws-advance-game {:connection-id (:conn-id active)})]
+          (should= :ok (:status response))
+          (should= (assoc old-game :active-occupant (:id @tf2/medic)) @tf2/ctf)))
+
+      (it "notifies occupants of new active occupant"
+        (let [active @tf2/heavy
+              old-game @tf2/ctf
+              _response (sut/ws-advance-game {:connection-id (:conn-id active)})]
+          (should-have-invoked :push-to-occupants! {:with [(map db/entity (:occupants @tf2/sawmill))
+                                                           :game/update
+                                                           [(assoc old-game :active-occupant (:id @tf2/medic))]]})))))
+
   (context "ws-inc-counter"
     (context "failure"
       (it "if occupant not found"

@@ -67,6 +67,20 @@
             (run-round! game room)
             (apic/ok [game]))))))
 
+(defn maybe-not-active-occupant [game occupant]
+  (when (not= (:active-occupant game) (:id occupant))
+    (apic/fail nil "You can only advance the game if it is your turn!")))
+
+(defn ws-advance-game [{:keys [connection-id] :as _request}]
+  (with-lock
+    (let [occupant (occupantc/by-conn-id connection-id)
+          room (roomc/by-occupant occupant)
+          game (gamec/by-room room)]
+      (or (maybe-not-active-occupant game occupant)
+          (let [game (db/tx game :active-occupant (:id (gamec/next-occupant game)))]
+            (room/push-to-room! room [game] :game/update)
+            (apic/ok))))))
+
 (defn inc-counter! [game]
   (db/tx (update game :counter inc)))
 

@@ -39,11 +39,15 @@
 (defn drop-until [pred coll]
   (drop-while (complement pred) coll))
 
-(defn next-occupant [current-occupant occupants]
-  (if-not current-occupant
+(defn next-occupant
+  ([game]
+   (let [room (db/entity (:room (db/ffind-by :game-room :game (:id game game))))]
+     (next-occupant (db/entity (:active-occupant game)) (map db/entity (:occupants room)))))
+  ([current-occupant occupants]
+   (if-not current-occupant
     (first occupants)
     (->> occupants
          cycle
          (drop-until #(id= current-occupant %))
          (drop-until #(not (team= current-occupant %)))
-         first)))
+         first))))
