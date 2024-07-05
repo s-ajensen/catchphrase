@@ -23,7 +23,9 @@
 (defn start-round [game]
   (assoc game :state :started
               :round-start (time/now)
-              :round-length (+ base-len (time/seconds (rand-int 20)))))
+              :round-length (+ base-len (time/seconds (rand-int 20)))
+              :active-occupant (first (:occupants (db/entity (:room (db/ffind-by :game-room :game (:id game game))))))))
+                                                                      ; ^ product of bad design. occupants should really be a game thing
 
 (defn stop-round [game]
   (assoc game :state :round-end))
@@ -37,7 +39,7 @@
 (defn drop-until [pred coll]
   (drop-while (complement pred) coll))
 
-(defn next-occupant [occupants current-occupant]
+(defn next-occupant [current-occupant occupants]
   (if-not current-occupant
     (first occupants)
     (->> occupants

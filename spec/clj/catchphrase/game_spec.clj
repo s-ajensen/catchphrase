@@ -93,6 +93,9 @@
           (should= (time/seconds 50) (:round-length @game))
           (should= (time/seconds 50) (:round-length @tf2/ctf))))
 
+      (it "with active occupant"
+        (should= (:id @tf2/heavy) (:active-occupant @game)))
+
       (it "notifies occupants of game start"
         @response
         (should-have-invoked :push-to-occupants! {:with [(map db/entity (:occupants @tf2/sawmill))
