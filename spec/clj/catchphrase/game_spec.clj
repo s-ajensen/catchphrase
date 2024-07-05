@@ -1,5 +1,6 @@
 (ns catchphrase.game-spec
   (:require [c3kit.apron.time :as time]
+            [catchphrase.gamec :as gamec]
             [catchphrase.teamc :as teamc]
             [catchphrase.tf2 :as tf2]
             [catchphrase.dispatch :as dispatch]
@@ -39,7 +40,7 @@
     (redefs-around [sut/sleep! (stub :sleep!)
                     dispatch/push-to-occupants! (stub :push-to-occupants!)])
 
-    (before (sut/start-round! @tf2/ctf))
+    (before (gamec/start-round! @tf2/ctf))
 
     (it "waits for round to end"
       (sut/-run-round! @tf2/ctf @tf2/sawmill)
@@ -106,7 +107,7 @@
         (should-have-invoked :run-round! {:with [@tf2/ctf @tf2/sawmill]}))))
 
   (context "ws-advance-game"
-    (before (sut/start-round! @tf2/ctf))
+    (before (gamec/start-round! @tf2/ctf))
     (redefs-around [dispatch/push-to-occupants! (stub :push-to-occupants!)])
 
     (it "fails if occupant isn't the active occupant of the game"
@@ -131,6 +132,34 @@
           (should-have-invoked :push-to-occupants! {:with [(map db/entity (:occupants @tf2/sawmill))
                                                            :game/update
                                                            [(assoc old-game :active-occupant (:id @tf2/medic))]]})))))
+
+  (context "ws-steal-game"
+    (before (-> @tf2/ctf gamec/start-round! gamec/advance-game! gamec/stop-round!))
+    (redefs-around [dispatch/push-to-occupants! (stub :push-to-occupants!)])
+
+    (it "fails if occupant isn't the active occupant of the game"
+      (let [non-active @tf2/heavy
+            response (sut/ws-steal-game {:connection-id (:conn-id non-active)})]
+        (should= :fail (:status response))
+        (should-be-nil (:payload response))
+        (should= "You can only advance the game if it is your turn!" (apic/flash-text response 0))))
+
+    (context "success"
+      (it "increments other team's points"
+        (let [active @tf2/medic
+              old-blu (db/ffind-by :team :game (:id @tf2/ctf) :color :blu)
+              response (sut/ws-steal-game {:connection-id (:conn-id active)})
+              new-blu (db/ffind-by :team :game (:id @tf2/ctf) :color :blu)]
+          (should= :ok (:status response))
+          (should= (assoc old-blu :points 1) new-blu)))
+
+      (it "notifies occupants of new points"
+        (let [active @tf2/medic
+              old-blu (db/ffind-by :team :game (:id @tf2/ctf) :color :blu)
+              _response (sut/ws-steal-game {:connection-id (:conn-id active)})]
+          (should-have-invoked :push-to-occupants! {:with [(map db/entity (:occupants @tf2/sawmill))
+                                                           :game/update
+                                                           [(assoc old-blu :points 1)]]})))))
 
   (context "ws-inc-counter"
     (context "failure"

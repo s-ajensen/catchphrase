@@ -6,6 +6,7 @@
 
 (defn create-game []
   {:kind    :game
+   :state   :lobby
    :counter 0})
 
 (defn create-game! []
@@ -27,8 +28,14 @@
               :active-occupant (first (:occupants (db/entity (:room (db/ffind-by :game-room :game (:id game game))))))))
                                                                       ; ^ product of bad design. occupants should really be a game thing
 
+(defn start-round! [game]
+  (db/tx (start-round game)))
+
 (defn stop-round [game]
   (assoc game :state :round-end))
+
+(defn stop-round! [game]
+  (db/tx (stop-round game)))
 
 (defn id= [a b]
   (= (:id a) (:id b)))
@@ -51,3 +58,6 @@
          (drop-until #(id= current-occupant %))
          (drop-until #(not (team= current-occupant %)))
          first))))
+
+(defn advance-game! [game]
+  (db/tx game :active-occupant (:id (next-occupant game))))

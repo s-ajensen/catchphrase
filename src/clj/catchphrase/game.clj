@@ -53,16 +53,13 @@
 (defn run-round! [game room]
   (future (-run-round! game room)))
 
-(defn start-round! [game]
-  (db/tx (gamec/start-round game)))
-
 (defn ws-start-game [{:keys [connection-id] :as _request}]
   (with-lock
     (let [occupant (occupantc/by-conn-id connection-id)
           room (roomc/by-occupant occupant)
           game (gamec/by-room room)]
       (or (maybe-not-host room occupant)
-          (let [game (start-round! game)]
+          (let [game (gamec/start-round! game)]
             (room/push-to-room! room [game] :game/update)
             (run-round! game room)
             (apic/ok [game]))))))
@@ -77,8 +74,20 @@
           room (roomc/by-occupant occupant)
           game (gamec/by-room room)]
       (or (maybe-not-active-occupant game occupant)
-          (let [game (db/tx game :active-occupant (:id (gamec/next-occupant game)))]
+          (let [game (gamec/advance-game! game)]
             (room/push-to-room! room [game] :game/update)
+            (apic/ok))))))
+
+(defn ws-steal-game [{:keys [connection-id] :as _request}]
+  (with-lock
+    (let [occupant (occupantc/by-conn-id connection-id)
+          room (roomc/by-occupant occupant)
+          game (gamec/by-room room)
+          team (:team occupant)]
+      (or (maybe-not-active-occupant game occupant)
+          (let [other-team (ccc/ffilter #(not= team (:id %)) (db/find-by :team :game (:id game)))
+                new-team (db/tx (update-in other-team [:points] inc))]
+            (room/push-to-room! room [new-team] :game/update)
             (apic/ok))))))
 
 (defn inc-counter! [game]

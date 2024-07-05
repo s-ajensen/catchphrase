@@ -62,6 +62,7 @@
    :game/fetch          'catchphrase.game/ws-fetch-game
    :game/start          'catchphrase.game/ws-start-game
    :game/advance        'catchphrase.game/ws-advance-game
+   :game/steal          'catchphrase.game/ws-steal-game
    :game/inc-counter    'catchphrase.game/ws-inc-counter
    })
 
