@@ -21,9 +21,9 @@
   (when-not room
     (apic/fail {} "Room not found")))
 
-(defn maybe-game-not-found [game]
-  (when-not game
-    (apic/fail {} "Game not found")))
+(defn maybe-team-not-found [team]
+  (when-not team
+    (apic/fail {} "Team not found")))
 
 (defn ws-fetch-game [{:keys [connection-id] :as _request}]
   (let [occupant (occupantc/by-conn-id connection-id)
@@ -92,18 +92,17 @@
             (room/push-to-room! room [new-team] :game/update)
             (apic/ok))))))
 
-(defn inc-counter! [game]
-  (db/tx (update game :counter inc)))
+(defn inc-counter! [team]
+  (db/tx (update team :points inc)))
 
-(defn inc-n-dispatch! [room game]
-  (room/push-to-room! room (inc-counter! game) :game/update)
+(defn inc-n-dispatch! [room team]
+  (room/push-to-room! room [(inc-counter! team)] :game/update)
   (apic/ok))
 
-(defn ws-inc-counter [{:keys [connection-id] :as _request}]
+(defn ws-inc-points [{:keys [connection-id params] :as _request}]
   (let [occupant (occupantc/by-conn-id connection-id)
         room (roomc/by-occupant occupant)
-        game (gamec/by-room room)]
-    (or (maybe-occupant-not-found occupant)
-        (maybe-room-not-found room)
-        (maybe-game-not-found game)
-        (inc-n-dispatch! room game))))
+        team (:team params)
+        team-entity (delay (db/entity team))]
+    (or (maybe-team-not-found team)
+        (inc-n-dispatch! room @team-entity))))

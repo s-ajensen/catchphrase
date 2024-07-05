@@ -63,7 +63,7 @@
    :game/start          'catchphrase.game/ws-start-game
    :game/advance        'catchphrase.game/ws-advance-game
    :game/steal          'catchphrase.game/ws-steal-game
-   :game/inc-counter    'catchphrase.game/ws-inc-counter
+   :game/inc-points     'catchphrase.game/ws-inc-points
    })
 
 (def ajax-routes-handler

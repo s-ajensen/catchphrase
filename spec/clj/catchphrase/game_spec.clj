@@ -163,35 +163,24 @@
 
   (context "ws-inc-counter"
     (context "failure"
-      (it "if occupant not found"
-        (let [response (sut/ws-inc-counter {:connection-id "blah"})]
+      (it "if team not found"
+        (let [response (sut/ws-inc-points {:connection-id (:conn-id @tf2/heavy)})]
           (should= :fail (:status response))
-          (should= "Occupant not found" (apic/flash-text response 0))))
-
-      (it "if room not found"
-        (let [response (sut/ws-inc-counter {:connection-id (:conn-id @tf2/spy)})]
-          (should= :fail (:status response))
-          (should= "Room not found" (apic/flash-text response 0))))
-
-      (it "if game not found"
-        (db/delete-all :game)
-        (db/delete-all :game-room)
-        (let [response (sut/ws-inc-counter {:connection-id (:conn-id @tf2/heavy)})]
-          (should= :fail (:status response))
-          (should= "Game not found" (apic/flash-text response 0)))))
+          (should= "Team not found" (apic/flash-text response 0)))))
 
     (context "success"
       (redefs-around [dispatch/push-to-connections! (stub :push-to-connections!)])
 
-      (it "updates counter"
-        (let [response (sut/ws-inc-counter {:connection-id (:conn-id @tf2/heavy)})]
+      (it "updates points of team"
+        (let [response (sut/ws-inc-points {:connection-id (:conn-id @tf2/heavy)
+                                           :params {:team (:active-team @tf2/ctf)}})]
           (should= :ok (:status response))
-          (should= 1 (:counter (db/entity (:id @tf2/ctf))))))
+          (should= 1 (:points (db/entity (:active-team @tf2/ctf))))))
 
-      (it "disscout to occupants"
-        (let [game @tf2/ctf
-              response (sut/ws-inc-counter {:connection-id (:conn-id @tf2/heavy)})]
+      (it "push to occupants"
+        (let [response (sut/ws-inc-points {:connection-id (:conn-id @tf2/heavy)
+                                           :params {:team (:active-team @tf2/ctf)}})]
           (should= :ok (:status response))
           (should-have-invoked :push-to-connections! {:with [(map (comp :conn-id db/entity) (:occupants @tf2/sawmill))
                                                              :game/update
-                                                             (update game :counter inc)]}))))))
+                                                             [(db/entity (:active-team @tf2/ctf))]]}))))))
