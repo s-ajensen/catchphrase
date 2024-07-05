@@ -2,7 +2,7 @@
   (:require [c3kit.wire.apic :as apic]
             [clojure.string :as str]))
 
-(def words (delay (cycle (shuffle (str/split-lines (slurp "words.txt"))))))
+(def words (delay (flatten (repeatedly #(shuffle (str/split-lines (slurp "words.txt")))))))
 (def idx (atom 0))
 
 (defn ws-next-word [_request]
