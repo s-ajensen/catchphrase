@@ -50,7 +50,7 @@
       (sut/-run-round! @tf2/ctf @tf2/sawmill)
       (should= :round-end (:state @tf2/ctf)))
 
-    (it "it assigns points to non-active team"
+    #_(it "it assigns points to non-active team"
       (sut/-run-round! @tf2/ctf @tf2/sawmill)
       (let [[blu red] (teamc/by-game @tf2/ctf)]
         (should= (:id blu) (:active-team @tf2/ctf))
@@ -61,7 +61,7 @@
       (let [[blu red] (teamc/by-game @tf2/ctf)]
         (should-have-invoked :push-to-occupants! {:with [(map db/entity (:occupants @tf2/sawmill))
                                                          :game/update
-                                                         [@tf2/ctf red]]}))))
+                                                         [@tf2/ctf]]}))))
 
   (context "ws-start-game"
 
