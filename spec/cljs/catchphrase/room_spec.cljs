@@ -120,20 +120,10 @@
           (wire/click! "#-join-button")
           (should-not-have-invoked :ws/call!))))
 
-    (context "room"
-      (before (occupant/install! @tf2/heavy)
-              (wire/flush))
-
-      (context "displays teams"
-        (it "blu"
-          (should= "heavy (Host)" (wire/html (str "#-blu-" (:id @tf2/heavy))))
-          (should= "scout" (wire/html (str "#-blu-" (:id @tf2/scout)))))
-
-        (it "red"
-          (should= "medic" (wire/html (str "#-red-" (:id @tf2/medic))))))
-
-      (it "displays game"
-        (should-select "#-game-container"))))
+    (it "displays game"
+      (occupant/install! @tf2/heavy)
+      (wire/flush)
+      (should-select "#-game-container")))
 
   (it "receives room update"
     (ws/push-handler {:kind :room/update :params [(roomc/->room "Greetings")]})

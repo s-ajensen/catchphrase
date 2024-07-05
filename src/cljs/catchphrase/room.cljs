@@ -10,14 +10,6 @@
             [catchphrase.occupant :as occupant]
             [catchphrase.page :as page]))
 
-(def blu (reagent/track #(db/ffind-by :team :game (:id @state/game) :color :blu)))
-(defn on-blu? [occupant] (= (:id @blu) (:team occupant)))
-(def blu-occupants (reagent/track #(filterv on-blu? @state/occupants)))
-
-(def red (reagent/track #(db/ffind-by :team :game (:id @state/game) :color :red)))
-(defn on-red? [occupant] (= (:id @red) (:team occupant)))
-(def red-occupants (reagent/track #(filterv on-red? @state/occupants)))
-
 (defn- maybe-join-room! [nickname]
   (when (not (str/blank? nickname))
     (ws/call! :room/join
@@ -45,40 +37,30 @@
 (defn- fetch-game []
   (ws/call! :game/fetch nil db/tx*))
 
-(defn display-team [prefix occupants]
-  [:ul (ccc/for-all [occupant occupants]
-    [:li
-     {:key (:id occupant)
-      :id  (str "-" prefix "-" (:id occupant))}
-     (str (:nickname occupant) (when (state/host? occupant) " (Host)"))])])
-
 (defn room-component []
   (reagent/create-class
     {:component-did-mount fetch-game
      :reagent-render
      (fn []
-       [:div.main-container
-        {:id "-room"}
-        [:div.left-container
-         [:br]
-         [:br]
-         [:h3 "Team Blu"]
-         (display-team "blu" @blu-occupants)]
-        [:div.center
-         [:div.game-container
-          [:h1 "catchphrase"]
-          (game/full)]]
-        [:div.right-container
-         [:br]
-         [:br]
-         [:h3 "Team Red"]
-         (display-team "red" @red-occupants)]])}))
+       (game/full))}))
 
 (defn nickname-prompt-or-room [nickname-ratom]
-  [:div {:id "-prompt-or-room"}
+  [:<>
+   [:div {:id "-prompt-or-room"}
    (if (str/blank? @nickname-ratom)
      [nickname-prompt nickname-ratom]
-     [room-component])])
+     [room-component])]
+   [:div {:style {:width "50vw"
+                  :height "100vh"
+                  :background-color "#a7584b"
+                  :position "absolute"
+                  :z-index "-1"
+                  :left "50%"}}]
+   [:div {:style {:width "50vw"
+                  :height "100vh"
+                  :background-color "#537d8b"
+                  :position "absolute"
+                  :z-index "-1"}}]])
 
 (defn maybe-not-found []
   (if @state/room
