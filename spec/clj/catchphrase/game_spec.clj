@@ -183,4 +183,15 @@
           (should= :ok (:status response))
           (should-have-invoked :push-to-connections! {:with [(map (comp :conn-id db/entity) (:occupants @tf2/sawmill))
                                                              :game/update
-                                                             [(db/entity (:active-team @tf2/ctf))]]}))))))
+                                                             [(db/entity (:active-team @tf2/ctf))]]})))
+
+      (it "ends game if at 7 points"
+        (db/tx (db/entity (:active-team @tf2/ctf)) :points 6)
+        (let [response (sut/ws-inc-points {:connection-id (:conn-id @tf2/heavy)
+                                           :params {:team (:active-team @tf2/ctf)}})]
+          (should= :ok (:status response))
+          (should= :over (:state @tf2/ctf))
+          (should-have-invoked :push-to-connections! {:with [(map (comp :conn-id db/entity) (:occupants @tf2/sawmill))
+                                                             :game/update
+                                                             [(db/entity (:active-team @tf2/ctf))
+                                                              @tf2/ctf]]}))))))

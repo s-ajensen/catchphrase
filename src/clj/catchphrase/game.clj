@@ -96,8 +96,11 @@
   (db/tx (update team :points inc)))
 
 (defn inc-n-dispatch! [room team]
-  (room/push-to-room! room [(inc-counter! team)] :game/update)
-  (apic/ok))
+  (let [new-team (inc-counter! team)
+        game (db/entity (:game team))
+        payload (if (>= (:points new-team) 7) [new-team (db/tx game :state :over)] [new-team])]
+    (room/push-to-room! room payload :game/update)
+    (apic/ok)))
 
 (defn ws-inc-points [{:keys [connection-id params] :as _request}]
   (let [occupant (occupantc/by-conn-id connection-id)
