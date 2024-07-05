@@ -1,5 +1,6 @@
 (ns catchphrase.gamec
-  (:require [c3kit.apron.time :as time]
+  (:require [c3kit.apron.corec :as ccc]
+            [c3kit.apron.time :as time]
             [c3kit.bucket.api :as db]
             [catchphrase.teamc :as teamc]))
 
@@ -33,11 +34,14 @@
 (defn team= [a b]
   (= (:team a) (:team b)))
 
+(defn drop-until [pred coll]
+  (drop-while (complement pred) coll))
+
 (defn next-occupant [occupants current-occupant]
   (if-not current-occupant
     (first occupants)
     (->> occupants
          cycle
-         (drop-while #(not (id= current-occupant %)))
-         (drop-while #(team= current-occupant %))
+         (drop-until #(id= current-occupant %))
+         (drop-until #(not (team= current-occupant %)))
          first)))
