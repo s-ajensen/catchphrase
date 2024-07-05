@@ -58,6 +58,7 @@
   (test-webs :game/advance         catchphrase.game/ws-advance-game)
   (test-webs :game/steal           catchphrase.game/ws-steal-game)
   (test-webs :game/inc-points      catchphrase.game/ws-inc-points)
+  (test-webs :word/next-word       catchphrase.word/ws-next-word)
 
   (it "not-found global - nil - handled by http"
     (let [response (routes/handler {:uri "/blah" :request-method :get})]
