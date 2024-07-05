@@ -32,9 +32,11 @@
           (str (:nickname occupant) (when (state/host? occupant) " (Host)"))])])
 
 (defmethod ws/push-handler :game/update [push]
-  (db/tx* (:params push))
-  (if (= :round-end (:state @state/game))
-    (ws/call! :word/next-word nil receive-new-word)))
+  (let [old-state (:state @state/game)]
+    (db/tx* (:params push))
+    (if (and (= :started (:state @state/game))
+             (not= :started old-state))
+      (ws/call! :word/next-word nil receive-new-word))))
 
 (defmulti state-label :state)
 

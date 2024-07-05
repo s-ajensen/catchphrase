@@ -39,8 +39,9 @@
       (wire/flush)
       (should-not-be-nil (db/ffind-by :team :color :yellow)))
 
-    (it "fetches next word if round end"
-      (ws/push-handler {:kind :game/update :params [(assoc @tf2/ctf :state :round-end)]})
+    (it "fetches next word if game started"
+      (db/tx @tf2/ctf :state :round-end)
+      (ws/push-handler {:kind :game/update :params [(assoc @tf2/ctf :state :started)]})
       (should-have-invoked :ws/call! {:with [:word/next-word nil sut/receive-new-word]}))
 
     (it "doesn't fetch next word if not round end"
