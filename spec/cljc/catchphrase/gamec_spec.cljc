@@ -4,7 +4,7 @@
             [catchphrase.gamec :as sut]
             [catchphrase.roomc :as roomc]
             [catchphrase.tf2 :as tf2]
-            [speclj.core #?(:clj :refer :cljs :refer-macros) [focus-context before describe context it should=]]))
+            [speclj.core #?(:clj :refer :cljs :refer-macros) [focus-it before describe context it should=]]))
 
 (describe "gamec"
   (tf2/init-with-schemas)
@@ -15,6 +15,7 @@
 
     (it "for game with 1 occupant"
       (roomc/join-room! @tf2/egypt @tf2/heavy)
+      (sut/start-round! @tf2/cp)
       (should= (:id @tf2/heavy) (:active-occupant (sut/advance-game! @tf2/cp))))
 
     (it "for game with 2 occupants"
@@ -53,9 +54,23 @@
       (sut/advance-game! @tf2/cp)
       (should= (:id @tf2/demo) (:active-occupant (sut/advance-game! @tf2/cp))))
 
-    (it "cycles after everyone plays"
+    (it "cycles after everyone plays (even number of players)"
+      (roomc/join-room! @tf2/egypt @tf2/heavy)
+      (roomc/join-room! @tf2/egypt (ccc/->inspect @tf2/scout))
+      (sut/start-round! @tf2/cp)
+      (sut/advance-game! @tf2/cp)
+      (should= (:id @tf2/heavy) (:active-occupant (sut/advance-game! @tf2/cp))))
+
+    (it "cycles after everyone plays (odd number of players)"
       (roomc/join-room! @tf2/egypt @tf2/heavy)
       (roomc/join-room! @tf2/egypt @tf2/scout)
+      (roomc/join-room! @tf2/egypt @tf2/medic)
+      (roomc/join-room! @tf2/egypt @tf2/spy)
+      (roomc/join-room! @tf2/egypt @tf2/demo)
       (sut/start-round! @tf2/cp)
+      (sut/advance-game! @tf2/cp)
+      (sut/advance-game! @tf2/cp)
+      (sut/advance-game! @tf2/cp)
+      (sut/advance-game! @tf2/cp)
       (sut/advance-game! @tf2/cp)
       (should= (:id @tf2/heavy) (:active-occupant (sut/advance-game! @tf2/cp))))))

@@ -1,6 +1,5 @@
 (ns catchphrase.roomc
-  (:require [c3kit.apron.corec :as ccc]
-            [c3kit.bucket.api :as db]
+  (:require [c3kit.bucket.api :as db]
             [catchphrase.gamec :as gamec]
             [catchphrase.occupantc :as occupantc]))
 

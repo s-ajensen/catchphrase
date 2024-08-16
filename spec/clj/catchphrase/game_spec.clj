@@ -123,7 +123,7 @@
               old-game @tf2/ctf
               response (sut/ws-advance-game {:connection-id (:conn-id active)})]
           (should= :ok (:status response))
-          (should= (assoc old-game :active-occupant (:id @tf2/medic)) @tf2/ctf)))
+          (should= (assoc old-game :active-occupant (:id @tf2/medic) :active-team (:team @tf2/medic)) @tf2/ctf)))
 
       (it "notifies occupants of new active occupant"
         (let [active @tf2/heavy
@@ -131,7 +131,8 @@
               _response (sut/ws-advance-game {:connection-id (:conn-id active)})]
           (should-have-invoked :push-to-occupants! {:with [(map db/entity (:occupants @tf2/sawmill))
                                                            :game/update
-                                                           [(assoc old-game :active-occupant (:id @tf2/medic))]]})))))
+                                                           [(assoc old-game :active-occupant (:id @tf2/medic)
+                                                                            :active-team (:team @tf2/medic))]]})))))
 
   (context "ws-steal-game"
     (before (-> @tf2/ctf gamec/start-round! gamec/advance-game! gamec/stop-round!))
