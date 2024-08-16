@@ -26,7 +26,7 @@
               :round-start (time/now)
               :round-length (+ base-len (time/seconds (rand-int 20)))
               :active-occupant (first (:occupants (db/entity (:room (db/ffind-by :game-room :game (:id game game))))))))
-                                                                      ; ^ product of bad design. occupants should really be a game thing
+; ^ product of bad design. occupants should really be a game thing
 
 (defn start-round! [game]
   (db/tx (start-round game)))
@@ -37,27 +37,17 @@
 (defn stop-round! [game]
   (db/tx (stop-round game)))
 
-(defn id= [a b]
-  (= (:id a) (:id b)))
-
-(defn team= [a b]
-  (= (:team a) (:team b)))
-
 (defn drop-until [pred coll]
   (drop-while (complement pred) coll))
 
-(defn next-occupant
-  ([game]
-   (let [room (db/entity (:room (db/ffind-by :game-room :game (:id game game))))]
-     (next-occupant (db/entity (:active-occupant game)) (map db/entity (:occupants room)))))
-  ([current-occupant occupants]
-   (if-not current-occupant
-    (first occupants)
-    (->> occupants
-         cycle
-         (drop-until #(id= current-occupant %))
-         (drop-until #(not (team= current-occupant %)))
-         first))))
+(defn next-occupant [game]
+  (let [room (db/entity (:room (db/ffind-by :game-room :game (:id game game))))
+        occupants (map db/entity (:occupants room))
+        [blu-team red-team] (-> (group-by :team occupants) vals vec)
+        rotation (interleave (cycle blu-team) (cycle red-team))]
+    (if (= 1 (count occupants))
+      (first occupants)
+      (db/entity (second (drop-until #(= (:active-occupant game) (:id %)) rotation))))))
 
 (defn advance-game! [game]
   (db/tx game :active-occupant (:id (next-occupant game))))

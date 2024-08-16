@@ -4,7 +4,8 @@
 (defn ->occupant
   ([nickname]
    {:kind     :occupant
-    :nickname nickname})
+    :nickname nickname
+    :plays    0})
   ([nickname conn-id]
    (merge (->occupant nickname)
           {:conn-id conn-id})))

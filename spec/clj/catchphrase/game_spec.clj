@@ -91,8 +91,8 @@
 
       (it "with round length"
         (with-redefs [rand-int (stub :rand-int {:return 10})]
-          (should= (time/seconds 50) (:round-length @game))
-          (should= (time/seconds 50) (:round-length @tf2/ctf))))
+          (should= (time/seconds 110) (:round-length @game))
+          (should= (time/seconds 110) (:round-length @tf2/ctf))))
 
       (it "with active occupant"
         (should= (:id @tf2/heavy) (:active-occupant @game)))

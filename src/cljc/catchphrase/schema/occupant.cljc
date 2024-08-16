@@ -7,6 +7,7 @@
    :nickname {:type :string :validate s/present? :message "must be present"}
    :conn-id  {:type :string :message "must be a string"}
    :team     {:type :ref}
+   :plays    {:type :long}
    })
 
 (def all [occupant])
