@@ -7,6 +7,7 @@
              com.cleancoders.c3kit/wire          {:git/url "git@github.com:cleancoders/c3kit-wire.git" :git/sha "19f87c52c6a7d80387cb26dd07a6c128d4a21ce5"}
              compojure/compojure                                       {:mvn/version "1.7.0"}
              org.clojure/clojure                                       {:mvn/version "1.11.1"}
+             ring/ring-jetty-adapter                                   {:mvn/version "1.8.1"}
              }
  :aliases   {
              :test     {:extra-deps  {

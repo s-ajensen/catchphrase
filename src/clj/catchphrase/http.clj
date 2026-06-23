@@ -9,7 +9,7 @@
             [c3kit.wire.jwt :refer [wrap-jwt]]
             [compojure.core :refer [defroutes]]
             [compojure.route :as route]
-            [org.httpkit.server :refer [run-server]]
+            [ring.adapter.jetty :refer [run-jetty]]
             [ring.middleware.anti-forgery :refer [wrap-anti-forgery]]
             [ring.middleware.content-type :refer [wrap-content-type]]
             [ring.middleware.cookies :refer [wrap-cookies]]
@@ -72,13 +72,13 @@
 (defn start [app]
   (let [port (or (some-> "PORT" System/getenv Integer/parseInt) 8123)]
     (log/info (str "Starting HTTP server: http://localhost:" port))
-    (let [server (run-server root-handler {:port port})]
+    (let [server (run-jetty root-handler {:port port :join? false})]
       (assoc app :http server))))
 
 (defn stop [app]
-  (when-let [stop-server-fn (:http app)]
+  (when-let [server (:http app)]
     (log/info "Stopping HTTP server")
-    (stop-server-fn :timeout 1000))
+    (.stop server))
   (dissoc app :http))
 
 
